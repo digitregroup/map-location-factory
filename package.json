@@ -1,6 +1,6 @@
 {
-  "name": "map-location-factory",
-  "version": "1.6.0",
+  "name": "@digitregroup/map-location-factory",
+  "version": "1.7.0",
   "description": "Map and location factory",
   "files": [
     "browser",
@@ -15,7 +15,8 @@
     "watch": "watchify src -t babelify -o browser/index.js -v",
     "test": "mocha --ui bdd tests/**.*.js -r jsdom-global/register -r @babel/register",
     "coverage": "nyc --exclude=vendors --exclude=tests npm run test",
-    "version": "auto-changelog -p && git add CHANGELOG.md"
+    "version": "auto-changelog -p && git add CHANGELOG.md",
+    "check-version": "git-npm-version-checker -v"
   },
   "browserify": {
     "transform": [
@@ -46,6 +47,7 @@
     "chai": "^4.2.0",
     "cross-env": "^5.2.0",
     "esm": "^3.2.25",
+    "git-npm-version-checker": "^1.1.0",
     "jsdom": "15.1.0",
     "jsdom-global": "3.0.2",
     "leaflet.gridlayer.googlemutant": "^0.8.0",
