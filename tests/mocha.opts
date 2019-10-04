@@ -1,0 +1,1 @@
+ --ui bdd -r jsdom-global/register -r @babel/register

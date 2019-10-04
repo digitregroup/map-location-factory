@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet.css" rel="stylesheet" type="text/css" />
+<script src="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet.js"></script>
+
+<script src="./leaflet-tilelayer-here.js"></script>
+
+  <meta charset="utf-8">
+  <title>Leaflet.TileLayer.HERE demo</title>
+  <style>
+	body {
+		margin: 0;
+	}
+
+	#map {
+		width:100vw;
+		height:100vh;
+	}
+  </style>
+</head>
+<body>
+  <div id='map'></div>
+
+
+
+  <script>
+
+    var myCenter = new L.LatLng(40.4, -3.6);
+    var map = new L.Map('map', {center: myCenter, zoom: 7});
+
+// L.tileLayer.here({
+// 	appId: 'xxxxxxxxxxxxxxx',
+// 	appCode: 'xxxxxxxxxxxxxxxxxx'
+// }).addTo(map);
+
+	var schemes = [
+		'normal.day',
+		'normal.day.grey',
+		'normal.day.transit',
+		'normal.night.transit',
+// 		'normal.traffic.day',
+// 		'normal.traffic.night',
+		'normal.day.custom',
+		'normal.night',
+		'normal.night.grey',
+		'pedestrian.day',
+		'pedestrian.day.mobile',
+		'pedestrian.night',
+		'pedestrian.night.mobile',
+		'carnav.day.grey',
+		'normal.day.mobile',
+		'normal.day.grey.mobile',
+		'normal.day.transit.mobile',
+		'normal.night.transit.mobile',
+		'normal.night.mobile',
+		'normal.night.grey.mobile',
+		'reduced.day',
+		'reduced.night',
+		'terrain.day',
+		'satellite.day',
+		'hybrid.day',
+		'hybrid.day.transit',
+		'hybrid.grey.day',
+// 		'hybrid.traffic.day',
+		'terrain.day.mobile',
+		'hybrid.day.mobile'
+	]
+
+	var baselayers = {};
+
+	for (var i in schemes) {
+		var scheme = schemes[i];
+		baselayers[scheme] = L.tileLayer.here({
+			appId: 'xxxxxxxxxxx',
+			appCode: 'xxxxxxxxxxxx',
+			scheme: scheme
+		});
+	}
+
+// 	baselayers['normal.day'].addTo(map);
+
+	L.control.layers(baselayers, {}, {collapsed: false}).addTo(map)
+
+
+
+  </script>
+</body>
+</html>
+

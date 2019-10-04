@@ -1,0 +1,56 @@
+{
+  "name": "map-location-factory",
+  "version": "1.6.0",
+  "description": "Map and location factory",
+  "files": [
+    "browser",
+    "node"
+  ],
+  "main": "node",
+  "browser": "browser",
+  "scripts": {
+    "build": "yarn test && yarn build-browser && yarn build-node && yarn version",
+    "build-browser": "browserify src -t babelify -o browser/index.js",
+    "build-node": "babel src --out-dir node",
+    "watch": "watchify src -t babelify -o browser/index.js -v",
+    "test": "mocha --ui bdd tests/**.*.js -r jsdom-global/register -r @babel/register",
+    "coverage": "nyc --exclude=vendors --exclude=tests npm run test",
+    "version": "auto-changelog -p && git add CHANGELOG.md"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "comments": false
+        }
+      ]
+    ]
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.4.5",
+    "cross-fetch": "^3.0.2",
+    "leaflet": "^1.4.0",
+    "lodash": "^4.17.14"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/register": "^7.4.4",
+    "babel-plugin-lodash": "^3.3.4",
+    "babelify": "^10.0.0",
+    "browserify": "^16.2.3",
+    "chai": "^4.2.0",
+    "cross-env": "^5.2.0",
+    "esm": "^3.2.25",
+    "jsdom": "15.1.0",
+    "jsdom-global": "3.0.2",
+    "leaflet.gridlayer.googlemutant": "^0.8.0",
+    "mocha": "^6.1.4",
+    "nyc": "^14.1.1",
+    "watchify": "^3.11.1"
+  }
+}
