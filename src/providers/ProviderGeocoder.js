@@ -128,7 +128,7 @@ class ProviderGeocoder {
       "971": "Guadeloupe",
       "972": "Martinique",
       "973": "Guyane",
-      "974": "La Réunion",
+      "974": "Réunion",
       "976": "Mayotte"
     };
   }
