@@ -79,8 +79,10 @@ class HereGeocoder extends ProviderGeocoder {
 
     if (this.config.suggest && this.config.suggest.options) {
       const buildParametersOptions = {...this.config.suggest.options};
+
       // Check if the query is a number
       if (query.trim().match(/^[0-9]*$/) !== null) {
+        
         // Force result type to postal code if the query is a number
         buildParametersOptions.resultType = 'postalCode'
       }
