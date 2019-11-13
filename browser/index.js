@@ -18942,7 +18942,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
                       params = 'city=' + encodeURIComponent('Lille');
                     } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
                       params = 'city=' + encodeURIComponent('Nangis');
-                    } else if (searchRequest.text.match(/-france$/i)) {
+                    } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
                       params = 'searchtext=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
                     } else {
                       params = 'searchtext=' + encodeURIComponent(searchRequest.text);
