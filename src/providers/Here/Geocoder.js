@@ -211,8 +211,8 @@ class HereGeocoder extends ProviderGeocoder {
         } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
           // Specific case for "Nangis, France", returns Nangis (district)
           params = 'city=' + encodeURIComponent('Nangis');
-        } else if (searchRequest.text.match(/-france$/i)) {
-          // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ...
+        } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
+          // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
           params = 'searchtext=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
         } else {
           params = 'searchtext=' + encodeURIComponent(searchRequest.text);
