@@ -19020,14 +19020,16 @@ var HereGeocoder = function (_ProviderGeocoder) {
         if (departementName) {
           data.results.push({
             id: params.term,
-            text: '(' + deptCode + ') ' + departementName
+            text: '(' + deptCode + ') ' + departementName,
+            type: _this4.mappingAdmLevel.county
           });
         }
 
         for (var i = 0; i < predictions.length; i++) {
           data.results.push({
             id: predictions[i].id,
-            text: predictions[i].label
+            text: predictions[i].label,
+            type: predictions[i].type
           });
         }
 
