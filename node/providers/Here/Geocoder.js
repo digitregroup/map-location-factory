@@ -13,7 +13,7 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
-var _objectSpread2 = _interopRequireDefault(require("@babel/runtime/helpers/objectSpread"));
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
@@ -30,6 +30,10 @@ var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits
 var _ProviderGeocoder2 = _interopRequireDefault(require("../ProviderGeocoder"));
 
 var _crossFetch = _interopRequireDefault(require("cross-fetch"));
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 var HereGeocoder =
 /*#__PURE__*/
@@ -125,7 +129,7 @@ function (_ProviderGeocoder) {
                 params = 'query=' + encodeURIComponent(query) + '&app_id=' + this.config.appId + '&app_code=' + this.config.appCode;
 
                 if (this.config.suggest && this.config.suggest.options) {
-                  buildParametersOptions = (0, _objectSpread2.default)({}, this.config.suggest.options); // Check if the query is a number
+                  buildParametersOptions = _objectSpread({}, this.config.suggest.options); // Check if the query is a number
 
                   if (query.trim().match(/^[0-9]*$/) !== null) {
                     // Force result type to postal code if the query is a number
@@ -171,7 +175,7 @@ function (_ProviderGeocoder) {
                   var labelParts = next.label.split(', '); // France, Corrèze => France, (19) Corrèze
 
                   var newLabel = labelParts.slice(0, -1).concat(['(' + departmentCode[0] + ') ' + labelParts.pop(-1)]).join(', ');
-                  return [].concat((0, _toConsumableArray2.default)(res), [(0, _objectSpread2.default)({}, next, {
+                  return [].concat((0, _toConsumableArray2.default)(res), [_objectSpread({}, next, {
                     label: newLabel
                   })]);
                 }, []) // Format response (inverse order label)
@@ -314,8 +318,8 @@ function (_ProviderGeocoder) {
                     } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
                       // Specific case for "Nangis, France", returns Nangis (district)
                       params = 'city=' + encodeURIComponent('Nangis');
-                    } else if (searchRequest.text.match(/-france$/i)) {
-                      // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ...
+                    } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
+                      // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
                       params = 'searchtext=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
                     } else {
                       params = 'searchtext=' + encodeURIComponent(searchRequest.text);
@@ -394,14 +398,16 @@ function (_ProviderGeocoder) {
         if (departementName) {
           data.results.push({
             id: params.term,
-            text: '(' + deptCode + ') ' + departementName
+            text: '(' + deptCode + ') ' + departementName,
+            type: _this4.mappingAdmLevel.county
           });
         }
 
         for (var i = 0; i < predictions.length; i++) {
           data.results.push({
             id: predictions[i].id,
-            text: predictions[i].label
+            text: predictions[i].label,
+            type: predictions[i].type
           });
         }
 
