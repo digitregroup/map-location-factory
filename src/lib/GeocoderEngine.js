@@ -2,6 +2,7 @@ import _ from "lodash";
 
 import HereGeocoder from "../providers/Here/Geocoder";
 import GoogleGeocoder from "../providers/Google/Geocoder";
+import MapboxGeocoder from "../providers/Mapbox/Geocoder";
 
 /**
  * Load Geocoder class according to type and config
@@ -14,10 +15,12 @@ class GeocoderEngine {
 
 GeocoderEngine.TYPE_GOOGLE = 'Google';
 GeocoderEngine.TYPE_HERE   = 'Here';
+GeocoderEngine.TYPE_MAPBOX = 'Mapbox';
 
 const geocoderClasses = {
   [GeocoderEngine.TYPE_HERE]:   HereGeocoder,
-  [GeocoderEngine.TYPE_GOOGLE]: GoogleGeocoder
+  [GeocoderEngine.TYPE_GOOGLE]: GoogleGeocoder,
+  [GeocoderEngine.TYPE_MAPBOX]: MapboxGeocoder,
 };
 
 // Default config for HERE

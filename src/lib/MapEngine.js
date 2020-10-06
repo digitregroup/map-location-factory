@@ -1,5 +1,6 @@
 import HereMap from "../providers/Here/Map";
 import GoogleMap from "../providers/Google/Map";
+import MapboxMap from "../providers/Mapbox/Map";
 
 /**
  * Load Map class according to type and config
@@ -12,10 +13,12 @@ class MapEngine {
 
 MapEngine.TYPE_HERE   = 'Here';
 MapEngine.TYPE_GOOGLE = 'Google';
+MapEngine.TYPE_MAPBOX = 'Mapbox';
 
 const mapClasses = {
   [MapEngine.TYPE_HERE]:   HereMap,
-  [MapEngine.TYPE_GOOGLE]: GoogleMap
+  [MapEngine.TYPE_GOOGLE]: GoogleMap,
+  [MapEngine.TYPE_MAPBOX]: MapboxMap,
 };
 
 export default MapEngine;

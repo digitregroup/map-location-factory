@@ -283,4 +283,4 @@ class HereGeocoder extends ProviderGeocoder {
   }
 }
 
-export default HereGeocoder
+export default HereGeocoder;
