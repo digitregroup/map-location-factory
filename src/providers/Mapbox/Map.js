@@ -23,10 +23,10 @@ class MapboxMap extends ProviderMap {
     const center = options.center || [48.856614, 2.3522219000000177];
     const zoom   = options.zoom || 17;
 
-    L.mapbox.accessToken = 'pk.eyJ1IjoiZGlnaXRhbGZhY3RvcnkiLCJhIjoiY2tmcWpkdnVvMHJ6NzJxcGZsZDJ6cmh4diJ9.ZPsGbRczlx9LH2sa6c03Mg';
+    L.mapbox.accessToken = this.config.mapboxToken;
 
     var mapboxTiles = L.tileLayer(
-      'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=' + L.mapbox.accessToken,
+      `https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token=${L.mapbox.accessToken}`,
       {
         attribution: '© <a href="https://www.mapbox.com/feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         tileSize: 512,
