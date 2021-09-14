@@ -1,6 +1,6 @@
 {
   "name": "@digitregroup/map-location-factory",
-  "version": "1.7.5",
+  "version": "1.7.7",
   "description": "Map and location factory",
   "files": [
     "browser",
