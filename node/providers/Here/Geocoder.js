@@ -21,30 +21,34 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
 
 var _ProviderGeocoder2 = _interopRequireDefault(require("../ProviderGeocoder"));
 
 var _crossFetch = _interopRequireDefault(require("cross-fetch"));
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2.default)(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
-var HereGeocoder =
-/*#__PURE__*/
-function (_ProviderGeocoder) {
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2.default)(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2.default)(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2.default)(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+var HereGeocoder = /*#__PURE__*/function (_ProviderGeocoder) {
   (0, _inherits2.default)(HereGeocoder, _ProviderGeocoder);
+
+  var _super = _createSuper(HereGeocoder);
 
   function HereGeocoder(config) {
     var _this;
 
     (0, _classCallCheck2.default)(this, HereGeocoder);
-    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(HereGeocoder).call(this));
+    _this = _super.call(this);
     _this.providerName = 'Here';
     _this.config = config;
     _this.mappingAdmLevel = {
@@ -107,9 +111,7 @@ function (_ProviderGeocoder) {
   }, {
     key: "suggest",
     value: function () {
-      var _suggest = (0, _asyncToGenerator2.default)(
-      /*#__PURE__*/
-      _regenerator.default.mark(function _callee(query, callback) {
+      var _suggest = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee(query, callback) {
         var _this3 = this;
 
         var url, params, buildParametersOptions, response, json, domTomCountryCodes, suggestions;
@@ -175,7 +177,7 @@ function (_ProviderGeocoder) {
                   var labelParts = next.label.split(', '); // France, Corrèze => France, (19) Corrèze
 
                   var newLabel = labelParts.slice(0, -1).concat(['(' + departmentCode[0] + ') ' + labelParts.pop(-1)]).join(', ');
-                  return [].concat((0, _toConsumableArray2.default)(res), [_objectSpread({}, next, {
+                  return [].concat((0, _toConsumableArray2.default)(res), [_objectSpread(_objectSpread({}, next), {}, {
                     label: newLabel
                   })]);
                 }, []) // Format response (inverse order label)
@@ -205,9 +207,7 @@ function (_ProviderGeocoder) {
   }, {
     key: "reverse",
     value: function () {
-      var _reverse = (0, _asyncToGenerator2.default)(
-      /*#__PURE__*/
-      _regenerator.default.mark(function _callee2(searchRequest, callback) {
+      var _reverse = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee2(searchRequest, callback) {
         var url, params, response, json, results;
         return _regenerator.default.wrap(function _callee2$(_context2) {
           while (1) {
@@ -279,9 +279,7 @@ function (_ProviderGeocoder) {
   }, {
     key: "geocode",
     value: function () {
-      var _geocode = (0, _asyncToGenerator2.default)(
-      /*#__PURE__*/
-      _regenerator.default.mark(function _callee3(searchRequest, callback) {
+      var _geocode = (0, _asyncToGenerator2.default)( /*#__PURE__*/_regenerator.default.mark(function _callee3(searchRequest, callback) {
         var url, params, dptCode, response, json, results;
         return _regenerator.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -326,7 +324,14 @@ function (_ProviderGeocoder) {
                     }
                   }
                 } else {
-                  if (searchRequest.label) params = 'searchtext=' + encodeURIComponent(searchRequest.label);
+                  if (searchRequest.label) {
+                    if (searchRequest.label == "Vienne") {
+                      // Specific case for "Vienne" department name
+                      params = 'searchtext=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+                    } else {
+                      params = 'searchtext=' + encodeURIComponent(searchRequest.label);
+                    }
+                  }
                 }
 
                 if (params) {
