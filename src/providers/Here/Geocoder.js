@@ -6,16 +6,16 @@ class HereGeocoder extends ProviderGeocoder {
   constructor(config) {
     super();
     this.providerName = 'Here';
-    this.config       = config;
+    this.config = config;
 
     this.mappingAdmLevel = {
-      state:       'state',
-      county:      'department',
-      country:     'country',
-      postalCode:  'postal_code',
-      city:        'city',
-      district:    'district',
-      street:      'route',
+      state: 'state',
+      county: 'department',
+      country: 'country',
+      postalCode: 'postal_code',
+      city: 'city',
+      district: 'district',
+      street: 'route',
       houseNumber: 'street_number'
     }
   }
@@ -23,12 +23,12 @@ class HereGeocoder extends ProviderGeocoder {
   _formatResponse(json) {
     return json.Response.View[0].Result.map(result => {
       return {
-        type:     this.mappingAdmLevel[result.MatchLevel],
-        id:       result.Location.LocationId,
+        type: this.mappingAdmLevel[result.MatchLevel],
+        id: result.Location.LocationId,
         position: {
-          latitude:  result.Location.DisplayPosition.Latitude,
+          latitude: result.Location.DisplayPosition.Latitude,
           longitude: result.Location.DisplayPosition.Longitude,
-          viewport:  [
+          viewport: [
             [
               result.Location.MapView.BottomRight.Latitude,
               result.Location.MapView.BottomRight.Longitude
@@ -39,15 +39,15 @@ class HereGeocoder extends ProviderGeocoder {
             ]
           ]
         },
-        address:  {
-          label:         result.Location.Address.Label,
-          district:      result.Location.Address.District,
-          city:          result.Location.Address.City,
-          postal_code:   result.Location.Address.PostalCode,
-          department:    result.Location.Address.County,
-          state:         result.Location.Address.State,
-          country:       result.Location.Address.Country,
-          route:         result.Location.Address.Street,
+        address: {
+          label: result.Location.Address.Label,
+          district: result.Location.Address.District,
+          city: result.Location.Address.City,
+          postal_code: result.Location.Address.PostalCode,
+          department: result.Location.Address.County,
+          state: result.Location.Address.State,
+          country: result.Location.Address.Country,
+          route: result.Location.Address.Street,
           street_number: result.Location.Address.HouseNumber
         }
       }
@@ -78,11 +78,11 @@ class HereGeocoder extends ProviderGeocoder {
       '&app_code=' + this.config.appCode;
 
     if (this.config.suggest && this.config.suggest.options) {
-      const buildParametersOptions = {...this.config.suggest.options};
+      const buildParametersOptions = { ...this.config.suggest.options };
 
       // Check if the query is a number
       if (query.trim().match(/^[0-9]*$/) !== null) {
-        
+
         // Force result type to postal code if the query is a number
         buildParametersOptions.resultType = 'postalCode'
       }
@@ -90,7 +90,7 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     const response = await fetch(url + params);
-    const json     = await response.json();
+    const json = await response.json();
 
     const domTomCountryCodes = [
       'GLP',
@@ -109,12 +109,12 @@ class HereGeocoder extends ProviderGeocoder {
 
     const suggestions = json.suggestions && json.suggestions
 
-    // Remove county and state for DOM-TOM
-    // (avoids Guadeloupe, Guadeloupe, Guadeloupe)
+      // Remove county and state for DOM-TOM
+      // (avoids Guadeloupe, Guadeloupe, Guadeloupe)
       .filter(suggest =>
         domTomCountryCodes.includes(suggest.countryCode)
-        ? !['county', 'state'].includes(suggest.matchLevel)
-        : true)
+          ? !['county', 'state'].includes(suggest.matchLevel)
+          : true)
 
       // Add department codes before department names
       // (avoid Corrèze-city mistaken for Corrèze-dpt)
@@ -137,15 +137,15 @@ class HereGeocoder extends ProviderGeocoder {
           .concat(['(' + departmentCode[0] + ') ' + labelParts.pop(-1)])
           .join(', ');
 
-        return [...res, {...next, label: newLabel}];
+        return [...res, { ...next, label: newLabel }];
 
       }, [])
 
       // Format response (inverse order label)
       .map(suggest => ({
         label: suggest.label.split(', ').reverse().join(', '),
-        id:    suggest.locationId,
-        type:  this.mappingAdmLevel[suggest.matchLevel],
+        id: suggest.locationId,
+        type: this.mappingAdmLevel[suggest.matchLevel],
       }));
 
     callback(suggestions || null, response.status);
@@ -173,7 +173,7 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     const response = await fetch(url + params);
-    const json     = await response.json();
+    const json = await response.json();
 
     let results = [];
     if (json && json.Response && json.Response.View && json.Response.View.length) {
@@ -219,7 +219,14 @@ class HereGeocoder extends ProviderGeocoder {
         }
       }
     } else {
-      if (searchRequest.label) params = 'searchtext=' + encodeURIComponent(searchRequest.label);
+      if (searchRequest.label) {
+        if (searchRequest.label == "Vienne") {
+          // Specific case for "Vienne" department name
+          params = 'searchtext=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+        } else {
+          params = 'searchtext=' + encodeURIComponent(searchRequest.label);
+        }
+      }
     }
 
     if (!params) {
@@ -234,7 +241,7 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     const response = await fetch(url + params);
-    const json     = await response.json();
+    const json = await response.json();
 
     let results = [];
     if (json && json.Response && json.Response.View && json.Response.View.length) {
@@ -247,17 +254,17 @@ class HereGeocoder extends ProviderGeocoder {
   autocompleteAdapter(params, callback) {
     const returnSuggestions = (predictions, status) => {
       predictions = predictions || [];
-      const data  = {results: []};
+      const data = { results: [] };
       if (status !== 200 || !predictions) {
         callback(data);
       }
 
       // Get department by code
-      const deptCode        = params.term.toUpperCase();
+      const deptCode = params.term.toUpperCase();
       const departementName = this.departmentDatas[deptCode];
       if (departementName) {
         data.results.push({
-          id:   params.term,
+          id: params.term,
           text: '(' + deptCode + ') ' + departementName,
           type: this.mappingAdmLevel.county
         });
@@ -277,7 +284,7 @@ class HereGeocoder extends ProviderGeocoder {
     if (params.term && params.term !== '') {
       this.suggest(params.term, returnSuggestions);
     } else {
-      const data = {results: []};
+      const data = { results: [] };
       callback(data);
     }
   }

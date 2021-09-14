@@ -34,7 +34,7 @@ var geocoderClasses = (_geocoderClasses = {}, (0, _defineProperty2.default)(_geo
 // DOM: FRA,GLP,GUF,MTQ,REU,MYT
 // TOM: BLM,MAF,NCL,PYF,SPM,ATF,WLF
 
-var defaultCountries = 'DEU,FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
+var defaultCountries = 'FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
 var defaultLanguage = 'FR'; // Configs
 
 var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_HERE, {
