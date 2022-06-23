@@ -49,7 +49,7 @@
     "cross-env": "^5.2.0",
     "esm": "^3.2.25",
     "git-npm-version-checker": "^1.1.0",
-    "jsdom": "15.1.0",
+    "jsdom": "16.5.0",
     "jsdom-global": "3.0.2",
     "leaflet.gridlayer.googlemutant": "^0.8.0",
     "mocha": "^6.1.4",
