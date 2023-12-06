@@ -5,8 +5,9 @@ const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
   GeocoderEngine.TYPE_HERE, {
-    "appId":   "xxxxxxxxxxxxxxxxxx",
-    "appCode": "xxxxxxxxxxxxxxxxxxxxxxx"
+    "appId":   "VoggXjZPkzVJu6enQp25",
+    "appCode": "5RZewgZ8kdwI057p2HsxqA",
+    "cache" : true
   });
 
 const germanEngine = new GeocoderEngine(
@@ -21,8 +22,9 @@ const germanEngine = new GeocoderEngine(
     },
     "geocode": {"options": {"country": "DEU", "language": "DE"}},
     "reverse": {"options": {"country": "DEU", "language": "DE"}},
-    "appId":   "xxxxxxxxxx",
-    "appCode": "xxxxxxxxxxxxxxxx"
+    "cache" : true,
+    "appId":   "VoggXjZPkzVJu6enQp25",
+    "appCode": "5RZewgZ8kdwI057p2HsxqA"
   });
 
 const fixedFloat = (number, decimals) => +number.toFixed(decimals);

@@ -1,5 +1,6 @@
 import ProviderGeocoder from '../ProviderGeocoder';
 import fetch from 'cross-fetch'
+const X_API_KEY = "JOaAbTsWnM38jCarO2GNF2VwUBpSNuGy2V8tTMOy";
 
 class HereGeocoder extends ProviderGeocoder {
 
@@ -172,7 +173,33 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.reverse.options);
     }
 
-    const response = await fetch(url + params);
+    let response = {};
+
+    if(this.config.cache) {
+      const paramsURLSearchParams = new URLSearchParams(params);
+      params =  Object.fromEntries(paramsURLSearchParams.entries());
+
+  
+      response =  await fetch('https://geocoder.digitregroup.io/reverse-geocode', {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': X_API_KEY
+        },
+        body: JSON.stringify({
+          "params": params
+        })
+      });
+    } else {
+      response = await fetch(url + params);
+    }
+    if(response.status!= 200) {
+      console.error("reverse");
+      console.error({
+        "params": params
+      });
+      console.error(response);
+    }
     const json = await response.json();
 
     let results = [];
@@ -240,14 +267,41 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.geocode.options);
     }
 
-    const response = await fetch(url + params);
+    let response = {};
+    if(this.config.cache) {
+      const paramsURLSearchParams = new URLSearchParams(params);
+      params =  Object.fromEntries(paramsURLSearchParams.entries());
+      delete params.country;
+      delete params.state;
+      delete params.city;
+   
+      response =  await fetch('https://geocoder.digitregroup.io/geocoder', {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': X_API_KEY
+        },
+        body: JSON.stringify({
+          "params": params
+        })
+      });
+    } else {
+      response = await fetch(url + params);
+    }
+    if(response.status!= 200) {
+      console.error("geocode");
+      console.error({
+        "params": params
+      });
+      console.error(response);
+    }
     const json = await response.json();
 
     let results = [];
     if (json && json.Response && json.Response.View && json.Response.View.length) {
       results = this._formatResponse(json);
     }
-
+ 
     callback(results, response.status);
   }
 
