@@ -1,5 +1,6 @@
 import ProviderGeocoder from '../ProviderGeocoder';
 import fetch from 'cross-fetch'
+import * as path from 'path';
 
 class HereGeocoder extends ProviderGeocoder {
 
@@ -172,7 +173,28 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.reverse.options);
     }
 
-    const response = await fetch(url + params);
+    let response = {};
+
+    if (this.config.cache) {
+      if(!this.config.cacheUrl || !this.config.cacheKey) {
+        throw new Error("Missing parameter cacheUrl || cacheKey");
+      }
+      const paramsURLSearchParams = new URLSearchParams(params);
+      params = Object.fromEntries(paramsURLSearchParams.entries());
+      const url = new URL(path.join("reverse-geocoder"), this.config.cacheUrl).toString();
+      response = await fetch(url, {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.config.cacheKey
+        },
+        body: JSON.stringify({
+          "params": params
+        })
+      });
+    } else {
+      response = await fetch(url + params);
+    }
     const json = await response.json();
 
     let results = [];
@@ -240,7 +262,28 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.geocode.options);
     }
 
-    const response = await fetch(url + params);
+    let response = {};
+    if (this.config.cache) {
+      if(!this.config.cacheUrl || !this.config.cacheKey) {
+        throw new Error("Missing parameter cacheUrl || cacheKey");
+      }
+      const paramsURLSearchParams = new URLSearchParams(params);
+      params = Object.fromEntries(paramsURLSearchParams.entries());
+
+      const url = new URL(path.join("geocoder"), this.config.cacheUrl).toString();
+      response = await fetch(url, {
+        method: "post",
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.config.cacheKey
+        },
+        body: JSON.stringify({
+          "params": params
+        })
+      });
+    } else {
+      response = await fetch(url + params);
+    }
     const json = await response.json();
 
     let results = [];
