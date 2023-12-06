@@ -1,6 +1,6 @@
 import ProviderGeocoder from '../ProviderGeocoder';
 import fetch from 'cross-fetch'
-const X_API_KEY = "JOaAbTsWnM38jCarO2GNF2VwUBpSNuGy2V8tTMOy";
+import * as path from 'path';
 
 class HereGeocoder extends ProviderGeocoder {
 
@@ -175,16 +175,18 @@ class HereGeocoder extends ProviderGeocoder {
 
     let response = {};
 
-    if(this.config.cache) {
+    if (this.config.cache) {
+      if(!this.config.cacheUrl || !this.config.cacheKey) {
+        throw new Error("Missing parameter cacheUrl || cacheKey");
+      }
       const paramsURLSearchParams = new URLSearchParams(params);
-      params =  Object.fromEntries(paramsURLSearchParams.entries());
-
-  
-      response =  await fetch('https://geocoder.digitregroup.io/reverse-geocode', {
+      params = Object.fromEntries(paramsURLSearchParams.entries());
+      const url = new URL(path.join("reverse-geocoder"), this.config.cacheUrl).toString();
+      response = await fetch(url, {
         method: "post",
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': X_API_KEY
+          'x-api-key': this.config.cacheKey
         },
         body: JSON.stringify({
           "params": params
@@ -192,13 +194,6 @@ class HereGeocoder extends ProviderGeocoder {
       });
     } else {
       response = await fetch(url + params);
-    }
-    if(response.status!= 200) {
-      console.error("reverse");
-      console.error({
-        "params": params
-      });
-      console.error(response);
     }
     const json = await response.json();
 
@@ -268,18 +263,19 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     let response = {};
-    if(this.config.cache) {
+    if (this.config.cache) {
+      if(!this.config.cacheUrl || !this.config.cacheKey) {
+        throw new Error("Missing parameter cacheUrl || cacheKey");
+      }
       const paramsURLSearchParams = new URLSearchParams(params);
-      params =  Object.fromEntries(paramsURLSearchParams.entries());
-      delete params.country;
-      delete params.state;
-      delete params.city;
-   
-      response =  await fetch('https://geocoder.digitregroup.io/geocoder', {
+      params = Object.fromEntries(paramsURLSearchParams.entries());
+
+      const url = new URL(path.join("geocoder"), this.config.cacheUrl).toString();
+      response = await fetch(url, {
         method: "post",
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': X_API_KEY
+          'x-api-key': this.config.cacheKey
         },
         body: JSON.stringify({
           "params": params
@@ -288,20 +284,13 @@ class HereGeocoder extends ProviderGeocoder {
     } else {
       response = await fetch(url + params);
     }
-    if(response.status!= 200) {
-      console.error("geocode");
-      console.error({
-        "params": params
-      });
-      console.error(response);
-    }
     const json = await response.json();
 
     let results = [];
     if (json && json.Response && json.Response.View && json.Response.View.length) {
       results = this._formatResponse(json);
     }
- 
+
     callback(results, response.status);
   }
 

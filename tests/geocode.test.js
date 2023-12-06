@@ -1,13 +1,17 @@
 require('jsdom-global')();
 require('chai').should();
+const API_KEY = "VoggXjZPkzVJu6enQp25";
+const APP_CODE = "5RZewgZ8kdwI057p2HsxqA";
 
 const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
   GeocoderEngine.TYPE_HERE, {
-    "appId":   "VoggXjZPkzVJu6enQp25",
-    "appCode": "5RZewgZ8kdwI057p2HsxqA",
-    "cache" : true
+    "appId":   API_KEY,
+    "appCode": APP_CODE,
+    "cacheEnable": true,
+    "cacheUrl": "https://geocoder-stage.digitregroup.io",
+    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
   });
 
 const germanEngine = new GeocoderEngine(
@@ -22,9 +26,11 @@ const germanEngine = new GeocoderEngine(
     },
     "geocode": {"options": {"country": "DEU", "language": "DE"}},
     "reverse": {"options": {"country": "DEU", "language": "DE"}},
-    "cache" : true,
-    "appId":   "VoggXjZPkzVJu6enQp25",
-    "appCode": "5RZewgZ8kdwI057p2HsxqA"
+    "cacheEnable" : true,
+    "cacheUrl": "https://geocoder-stage.digitregroup.io",
+    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2",
+    "appId": API_KEY,
+    "appCode": APP_CODE
   });
 
 const fixedFloat = (number, decimals) => +number.toFixed(decimals);
