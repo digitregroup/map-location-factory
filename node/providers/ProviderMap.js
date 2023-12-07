@@ -19,7 +19,9 @@ var _leaflet = _interopRequireDefault(require("leaflet"));
  *
  * You can choose to manipulate directly leaflet or write methods here
  */
-var ProviderMap = /*#__PURE__*/function () {
+var ProviderMap =
+/*#__PURE__*/
+function () {
   function ProviderMap() {
     (0, _classCallCheck2.default)(this, ProviderMap);
 

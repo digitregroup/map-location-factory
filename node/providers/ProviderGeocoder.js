@@ -15,7 +15,9 @@ var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/creat
  * This class define (but not implement) common methods of each provider
  * It also define shared variables
  */
-var ProviderGeocoder = /*#__PURE__*/function () {
+var ProviderGeocoder =
+/*#__PURE__*/
+function () {
   function ProviderGeocoder() {
     (0, _classCallCheck2.default)(this, ProviderGeocoder);
 

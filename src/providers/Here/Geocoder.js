@@ -1,6 +1,15 @@
+
 import ProviderGeocoder from '../ProviderGeocoder';
 import fetch from 'cross-fetch'
-import * as path from 'path';
+const urlJoin = (...args) =>
+  args
+    .join('/')
+    .replace(/[\/]+/g, '/')
+    .replace(/^(.+):\//, '$1://')
+    .replace(/^file:/, 'file:/')
+    .replace(/\/(\?|&|#[^!])/g, '$1')
+    .replace(/\?/g, '&')
+    .replace('&', '?');
 
 class HereGeocoder extends ProviderGeocoder {
 
@@ -181,7 +190,7 @@ class HereGeocoder extends ProviderGeocoder {
       }
       const paramsURLSearchParams = new URLSearchParams(params);
       params = Object.fromEntries(paramsURLSearchParams.entries());
-      const url = new URL(path.join("reverse-geocoder"), this.config.cacheUrl).toString();
+      const url = urlJoin(this.config.cacheUrl,"reverse-geocoder");
       response = await fetch(url, {
         method: "post",
         headers: {
@@ -270,7 +279,7 @@ class HereGeocoder extends ProviderGeocoder {
       const paramsURLSearchParams = new URLSearchParams(params);
       params = Object.fromEntries(paramsURLSearchParams.entries());
 
-      const url = new URL(path.join("geocoder"), this.config.cacheUrl).toString();
+      const url =urlJoin(this.config.cacheUrl,"geocoder");
       response = await fetch(url, {
         method: "post",
         headers: {
