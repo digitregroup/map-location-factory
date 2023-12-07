@@ -175,7 +175,7 @@ class HereGeocoder extends ProviderGeocoder {
 
     let response = {};
 
-    if (this.config.cache) {
+    if (this.config.cacheEnable) {
       if(!this.config.cacheUrl || !this.config.cacheKey) {
         throw new Error("Missing parameter cacheUrl || cacheKey");
       }
@@ -263,7 +263,7 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     let response = {};
-    if (this.config.cache) {
+    if (this.config.cacheEnable) {
       if(!this.config.cacheUrl || !this.config.cacheKey) {
         throw new Error("Missing parameter cacheUrl || cacheKey");
       }
