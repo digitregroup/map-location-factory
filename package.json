@@ -7,6 +7,10 @@
     "node",
     "vendors"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitregroup/map-location-factory"
+  },
   "main": "node",
   "browser": "browser",
   "scripts": {
