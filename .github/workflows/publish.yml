@@ -19,6 +19,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
       - name: Install Node Dependencies
         run: yarn install
+      - name: Build node
+        run: yarn build-node
       - name: Check package version
         run: yarn check-version
       - name: Publish to NPM

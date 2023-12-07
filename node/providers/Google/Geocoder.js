@@ -11,28 +11,28 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
-
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
 var _ProviderGeocoder2 = _interopRequireDefault(require("../ProviderGeocoder"));
 
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2.default)(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2.default)(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2.default)(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
-
-var GoogleGeocoder = /*#__PURE__*/function (_ProviderGeocoder) {
+/**
+ * The goal is to implement methods defined in ProviderGeocoder abstract class
+ * with unified output and input
+ */
+var GoogleGeocoder =
+/*#__PURE__*/
+function (_ProviderGeocoder) {
   (0, _inherits2.default)(GoogleGeocoder, _ProviderGeocoder);
-
-  var _super = _createSuper(GoogleGeocoder);
 
   function GoogleGeocoder(config) {
     var _this;
 
     (0, _classCallCheck2.default)(this, GoogleGeocoder);
-    _this = _super.call(this); // Provider name
+    _this = (0, _possibleConstructorReturn2.default)(this, (0, _getPrototypeOf2.default)(GoogleGeocoder).call(this)); // Provider name
 
     _this.providerName = 'Google'; // Loaded configuration
 
