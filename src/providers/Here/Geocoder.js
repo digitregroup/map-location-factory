@@ -58,7 +58,8 @@ class HereGeocoder extends ProviderGeocoder {
           state: result.Location.Address.State,
           country: result.Location.Address.Country,
           route: result.Location.Address.Street,
-          street_number: result.Location.Address.HouseNumber
+          street_number: result.Location.Address.HouseNumber,
+          county: result.Location.Address.County
         }
       }
     });
