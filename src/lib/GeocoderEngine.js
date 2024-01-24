@@ -2,6 +2,7 @@ import _ from "lodash";
 
 import HereGeocoder from "../providers/Here/Geocoder";
 import GoogleGeocoder from "../providers/Google/Geocoder";
+import AdresseGeocoder from "../providers/Adresse/Geocoder";
 
 /**
  * Load Geocoder class according to type and config
@@ -14,10 +15,12 @@ class GeocoderEngine {
 
 GeocoderEngine.TYPE_GOOGLE = 'Google';
 GeocoderEngine.TYPE_HERE   = 'Here';
+GeocoderEngine.TYPE_ADRESSE   = 'Adresse';
 
 const geocoderClasses = {
   [GeocoderEngine.TYPE_HERE]:   HereGeocoder,
-  [GeocoderEngine.TYPE_GOOGLE]: GoogleGeocoder
+  [GeocoderEngine.TYPE_GOOGLE]: GoogleGeocoder,
+  [GeocoderEngine.TYPE_ADRESSE]: AdresseGeocoder
 };
 
 // Default config for HERE
@@ -70,6 +73,31 @@ const geocoderConfig = {
       componentRestrictions: {
         country: ['fr', 'mq', 'gp', 'gf', 're', 'yt']
       }
+    }
+  },
+  [GeocoderEngine.TYPE_ADRESSE]: {
+    suggest: {
+      baseUrl:  'https://api-adresse.data.gouv.fr',
+      path:     '/search/',
+      options:  {
+        autocomplete: 1,
+        limit: 50,
+        type: 'municipality'
+      }
+    },
+    geocode: {
+      baseUrl:  'https://api-adresse.data.gouv.fr',
+      path:     '/search/',
+      options:  {
+        autocomplete: 0,
+        limit: 50,
+        type: 'municipality'
+      }
+    },
+    reverse: {
+      baseUrl:  'https://api-adresse.data.gouv.fr',
+      path:     '/reverse/',
+      resource: ['lon','lat'],
     }
   }
 };
