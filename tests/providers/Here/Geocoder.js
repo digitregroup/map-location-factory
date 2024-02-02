@@ -9,31 +9,28 @@ const HereGeocoder = require('../../../src/providers/Here/Geocoder').default;
 // DOM: FRA,GLP,GUF,MTQ,REU,MYT
 // TOM: BLM,MAF,NCL,PYF,SPM,ATF,WLF
 const defaultCountries = 'FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
-const defaultLanguage  = 'FR';
+const defaultLanguage  = 'fr';
 
 // Configs
 const geocoderConfig = {
   // appId: '',
   // appCode: '',
   suggest: {
-    baseUrl:  'https://autocomplete.geocoder.api.here.com',
-    path:     '/6.2/',
-    resource: 'suggest',
+    baseUrl:  'https://autosuggest.search.hereapi.com/v1/',
+    path:     '',
+    resource: 'autosuggest',
     options:  {
-      country:    defaultCountries,
-      language:   defaultLanguage,
-      maxresults: 50,
-      resultType: 'areas'
+      limit:5,
+      lang: defaultLanguage,
     }
   },
   geocode: {
-    baseUrl:  'https://geocoder.api.here.com',
-    path:     '/6.2/',
-    resource: 'geocode',
+    baseUrl:  'https://autocomplete.search.hereapi.com/v1/',
+    path:     '',
+    resource: 'autocomplete',
     options:  {
-      country:    defaultCountries,
-      language:   defaultLanguage,
-      maxresults: 5
+      limit:5,
+      lang: defaultLanguage,
     }
   },
   reverse: {

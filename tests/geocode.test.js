@@ -7,30 +7,10 @@ const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
   GeocoderEngine.TYPE_HERE, {
-    "appId":   API_KEY,
-    "appCode": APP_CODE,
-    "cacheEnable": true,
-    "cacheUrl": "https://geocoder-stage.digitregroup.io",
-    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
-  });
-
-const germanEngine = new GeocoderEngine(
-  GeocoderEngine.TYPE_HERE, {
-    "suggest": {
-      "options": {
-        "country":    "DEU",
-        "language":   "DE",
-        "maxresults": 50,
-        "resultType": "areas"
-      }
-    },
-    "geocode": {"options": {"country": "DEU", "language": "DE"}},
-    "reverse": {"options": {"country": "DEU", "language": "DE"}},
-    "cacheEnable" : true,
-    "cacheUrl": "https://geocoder-stage.digitregroup.io",
-    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2",
-    "appId": API_KEY,
-    "appCode": APP_CODE
+      "apiKey":   "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
+      "cacheEnable": false,
+      "cacheUrl": "https://geocoder-stage.digitregroup.io",
+      "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
   });
 
 const fixedFloat = (number, decimals) => +number.toFixed(decimals);
@@ -53,12 +33,12 @@ describe('GeocoderEngine addresses', function () {
       text: '1 rue de Rivoli, Paris'
     }, (results, status) => {
       status.should.be.eql(200);
-      oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85551969999999));
-      oneFixed(results[0].position.longitude).should.be.eql(oneFixed(2.3594045));
+      oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85554));
+      oneFixed(results[0].position.longitude).should.be.eql(oneFixed(2.35927));
     });
   });
   it('should geocode adNOBODY EXPECTS GERMANYdresses', async function () {
-    return germanEngine.geocode({
+    return engine.geocode({
       text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany'
     }, (results, status) => {
       status.should.be.eql(200);
@@ -67,9 +47,9 @@ describe('GeocoderEngine addresses', function () {
     });
   });
 
-  it('should geocode department codes', async function () {
+  it('should geocode postal code', async function () {
     return engine.geocode({
-      text: '75001'
+      text: '34110'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(48.9);
@@ -77,13 +57,21 @@ describe('GeocoderEngine addresses', function () {
     });
   });
 
-  it('should geocode department name', async function () {
-    return engine.geocode({
-      text: '34 Hérault France'
-    }, (results, status) => {
+  it('should geocode by label name', async function () {
+    return engine.geocode({label: 'Montpellier, Occitanie, France'},
+    (results, status) => {
       status.should.be.eql(200);
-      oneFixed(results[0].position.latitude).should.be.eql(48.8);
-      oneFixed(results[0].position.longitude).should.be.eql(2.2);
+      oneFixed(results[0].position.latitude).should.be.eql(43.6);
+      oneFixed(results[0].position.longitude).should.be.eql(3.9);
+    });
+  });
+
+  it('should geocode by id', async function () {
+    return engine.geocode({id: 'here:cm:namedplace:20098349'}, function (results, status) {
+      if (status === 200) {
+        oneFixed(results[0].position.latitude).should.be.eql(43.6);
+        oneFixed(results[0].position.longitude).should.be.eql(3.9);
+      }
     });
   });
 

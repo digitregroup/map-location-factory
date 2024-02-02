@@ -26,40 +26,43 @@ class HereGeocoder extends ProviderGeocoder {
       city: 'city',
       district: 'district',
       street: 'route',
-      houseNumber: 'street_number'
-    }
+      houseNumber: 'street_number',
+      locality: 'city'
+    };
+
+    this.lookupUrl = 'https://lookup.search.hereapi.com/v1/lookup';
   }
 
   _formatResponse(json) {
-    return json.Response.View[0].Result.map(result => {
+    return json.items.map(result => {
       return {
-        type: this.mappingAdmLevel[result.MatchLevel],
-        id: result.Location.LocationId,
+        type: this.mappingAdmLevel[result.resultType],
+        id: result.id,
         position: {
-          latitude: result.Location.DisplayPosition.Latitude,
-          longitude: result.Location.DisplayPosition.Longitude,
+          latitude: result.position.lat,
+          longitude: result.position.lng,
           viewport: [
             [
-              result.Location.MapView.BottomRight.Latitude,
-              result.Location.MapView.BottomRight.Longitude
+              result.position.lat,
+              result.position.lng
             ],
             [
-              result.Location.MapView.TopLeft.Latitude,
-              result.Location.MapView.TopLeft.Longitude
+              result.position.lat,
+              result.position.lng
             ]
           ]
         },
         address: {
-          label: result.Location.Address.Label,
-          district: result.Location.Address.District,
-          city: result.Location.Address.City,
-          postal_code: result.Location.Address.PostalCode,
-          department: result.Location.Address.County,
-          state: result.Location.Address.State,
-          country: result.Location.Address.Country,
-          route: result.Location.Address.Street,
-          street_number: result.Location.Address.HouseNumber,
-          county: result.Location.Address.County
+          label: result.address.label,
+          district: result.address.district,
+          city: result.address.city,
+          postal_code: result.address.postalCode,
+          department: this.departmentDatas[result.address.postalCode.substring(0,2)],
+          state: result.address.state,
+          country: result.address.countryCode,
+          route: result.address.street,
+          street_number: result.address.houseNumber,
+          county: result.address.county
         }
       }
     });
@@ -67,8 +70,7 @@ class HereGeocoder extends ProviderGeocoder {
 
   _getUrl(type) {
     return this.config[type].baseUrl +
-      this.config[type].path +
-      this.config[type].resource + '.json?';
+      this.config[type].resource + '?';
   }
 
   _buildParameters(options) {
@@ -84,9 +86,12 @@ class HereGeocoder extends ProviderGeocoder {
 
     const url = this._getUrl('suggest');
 
-    let params = 'query=' + encodeURIComponent(query) +
-      '&app_id=' + this.config.appId +
-      '&app_code=' + this.config.appCode;
+    let params = 'q=' + encodeURIComponent(query) +
+      '&apiKey=' + this.config.apiKey;
+
+    if(query.at){
+      params += '&at=' + radius;
+    }
 
     if (this.config.suggest && this.config.suggest.options) {
       const buildParametersOptions = { ...this.config.suggest.options };
@@ -118,19 +123,19 @@ class HereGeocoder extends ProviderGeocoder {
       'WLF'
     ];
 
-    const suggestions = json.suggestions && json.suggestions
+    const suggestions = json.items && json.items
 
       // Remove county and state for DOM-TOM
       // (avoids Guadeloupe, Guadeloupe, Guadeloupe)
       .filter(suggest =>
-        domTomCountryCodes.includes(suggest.countryCode)
-          ? !['county', 'state'].includes(suggest.matchLevel)
+        domTomCountryCodes.includes(suggest.address.countryCode)
+          ? !['county', 'state'].includes(suggest.address)
           : true)
 
       // Add department codes before department names
       // (avoid Corrèze-city mistaken for Corrèze-dpt)
       .reduce((res, next) => {
-        if (next.matchLevel !== 'county') {
+        if (next.resultType !== 'county') {
           return [...res, next];
         }
 
@@ -141,7 +146,7 @@ class HereGeocoder extends ProviderGeocoder {
           return [...res, next];
         }
 
-        const labelParts = next.label.split(', ');
+        const labelParts = next.address.label.split(', ');
 
         // France, Corrèze => France, (19) Corrèze
         const newLabel = labelParts.slice(0, -1)
@@ -154,9 +159,9 @@ class HereGeocoder extends ProviderGeocoder {
 
       // Format response (inverse order label)
       .map(suggest => ({
-        label: suggest.label.split(', ').reverse().join(', '),
-        id: suggest.locationId,
-        type: this.mappingAdmLevel[suggest.matchLevel],
+        label: suggest.address.label.split(', ').reverse().join(', '),
+        id: suggest.id,
+        type: this.mappingAdmLevel[suggest.resultType],
       }));
 
     callback(suggestions || null, response.status);
@@ -172,45 +177,20 @@ class HereGeocoder extends ProviderGeocoder {
 
     let params;
     if (searchRequest.latitude && searchRequest.longitude) {
-      params = 'prox=' + searchRequest.latitude + ',' + searchRequest.longitude + ',100';
+      params = 'at=' + searchRequest.latitude + ',' + searchRequest.longitude + ',100';
     } else {
       callback(null, 400);
       return;
     }
 
-    params += '&app_id=' + this.config.appId + '&app_code=' + this.config.appCode + '&mode=retrieveAddresses';
+    params += '&apiKey=' + this.config.apiKey;
     if (this.config.reverse && this.config.reverse.options) {
       params += this._buildParameters(this.config.reverse.options);
     }
-
-    let response = {};
-
-    if (this.config.cacheEnable) {
-      if(!this.config.cacheUrl || !this.config.cacheKey) {
-        throw new Error("Missing parameter cacheUrl || cacheKey");
-      }
-      const paramsURLSearchParams = new URLSearchParams(params);
-      params = Object.fromEntries(paramsURLSearchParams.entries());
-      const url = urlJoin(this.config.cacheUrl,"reverse-geocoder");
-      response = await fetch(url, {
-        method: "post",
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': this.config.cacheKey
-        },
-        body: JSON.stringify({
-          "params": params
-        })
-      });
-    } else {
-      response = await fetch(url + params);
-    }
+    let results;
+    const response = await this.getResponse(url, params);
     const json = await response.json();
-
-    let results = [];
-    if (json && json.Response && json.Response.View && json.Response.View.length) {
-      results = this._formatResponse(json);
-    }
+    results = json.items && json.items.length && this._formatResponse(json);
 
     callback(results, response.status);
   }
@@ -221,58 +201,89 @@ class HereGeocoder extends ProviderGeocoder {
       return;
     }
 
-    const url = this._getUrl('geocode');
-
     let params;
+
     if (searchRequest.id) {
-      params = 'locationid=' + searchRequest.id;
-    } else if (searchRequest.text) {
-      // (XX) XXXX => Match departments
-      const dptCode = searchRequest.text.match(/^\(([\d]+)\)/);
-      if (null !== dptCode) {
-        // Match exact department (called "county" in Here)
-        params = 'county=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
-      } else {
-        // Match text
-        if (searchRequest.text.match(/^Bretagne(?:, France)?/i)) {
-          // Specific case for Bretagne
-          params = 'state=' + encodeURIComponent('Bretagne');
-        } else if (searchRequest.text.match(/^Lille(?:, France)?/i)) {
-          // Specific case for "Lille, France", returns L'ille (district)
-          params = 'city=' + encodeURIComponent('Lille');
-        } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
-          // Specific case for "Nangis, France", returns Nangis (district)
-          params = 'city=' + encodeURIComponent('Nangis');
-        } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
-          // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
-          params = 'searchtext=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
-        } else {
-          params = 'searchtext=' + encodeURIComponent(searchRequest.text);
-        }
-      }
+      const url = this._getUrl('lookup');
+      const params = 'id=' + searchRequest.id + '&apiKey=' + this.config.apiKey;
+      const response = await this.getResponse(url, params);
+      const json = { items :  [await response.json()] };
+
+      callback(this._formatResponse(json), response.status);
     } else {
-      if (searchRequest.label) {
-        if (searchRequest.label == "Vienne") {
-          // Specific case for "Vienne" department name
-          params = 'searchtext=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+      if (searchRequest.text) {
+        // (XX) XXXX => Match departments
+        const dptCode = searchRequest.text.match(/^\(([\d]+)\)/);
+        if (null !== dptCode) {
+          // Match exact department (called "county" in Here)
+          params = 'county=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
         } else {
-          params = 'searchtext=' + encodeURIComponent(searchRequest.label);
+          // Match text
+          if (searchRequest.text.match(/^Bretagne(?:, France)?/i)) {
+            // Specific case for Bretagne
+            params = 'state=' + encodeURIComponent('Bretagne');
+          } else if (searchRequest.text.match(/^Lille(?:, France)?/i)) {
+            // Specific case for "Lille, France", returns L'ille (district)
+            params = 'city=' + encodeURIComponent('Lille');
+          } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
+            // Specific case for "Nangis, France", returns Nangis (district)
+            params = 'city=' + encodeURIComponent('Nangis');
+          } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
+            // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
+            params = 'q=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
+          } else {
+            params = 'q=' + encodeURIComponent(searchRequest.text);
+          }
+        }
+      } else {
+        if (searchRequest.label) {
+          if (searchRequest.label == "Vienne") {
+            // Specific case for "Vienne" department name
+            params = 'q=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+          } else {
+            params = 'q=' + encodeURIComponent(searchRequest.label);
+          }
         }
       }
+
+      if (!params) {
+        callback(null, 400);
+        return;
+      }
+
+      params += '&apiKey=' + this.config.apiKey;
+
+      if (this.config.geocode && this.config.geocode.options) {
+        params += this._buildParameters(this.config.geocode.options);
+      }
+
+      // TODO : Make the country code dynamic
+      params += '&in=countryCode:FRA'
+      // params += '&qq=houseNumber';
+      const url = this._getUrl(this.config.geocode.resource);
+      const response = await this.getResponse(url, params);
+
+      const json = await response.json();
+
+      let results = [];
+      if (json && json.items) {
+        results = this._formatResponse(json);
+      }
+
+      callback(results, response.status);
     }
 
-    if (!params) {
-      callback(null, 400);
-      return;
-    }
 
-    params += '&app_id=' + this.config.appId + '&app_code=' + this.config.appCode;
+  }
 
-    if (this.config.geocode && this.config.geocode.options) {
-      params += this._buildParameters(this.config.geocode.options);
-    }
-
-    let response = {};
+  /**
+   * return api response from Here or geocoder cache
+   *
+   * @url {string} hereUrl
+   * @param {obj} params
+   * @returns {Promise<Response>}
+   */
+  async getResponse(hereUrl, params) {
     if (this.config.cacheEnable) {
       if(!this.config.cacheUrl || !this.config.cacheKey) {
         throw new Error("Missing parameter cacheUrl || cacheKey");
@@ -280,8 +291,8 @@ class HereGeocoder extends ProviderGeocoder {
       const paramsURLSearchParams = new URLSearchParams(params);
       params = Object.fromEntries(paramsURLSearchParams.entries());
 
-      const url =urlJoin(this.config.cacheUrl,"geocoder");
-      response = await fetch(url, {
+      const cacheUrl = urlJoin(this.config.cacheUrl,"geocoder");
+      return await fetch(cacheUrl, {
         method: "post",
         headers: {
           'Content-Type': 'application/json',
@@ -292,18 +303,9 @@ class HereGeocoder extends ProviderGeocoder {
         })
       });
     } else {
-      response = await fetch(url + params);
+      return await fetch(hereUrl + params);
     }
-    const json = await response.json();
-
-    let results = [];
-    if (json && json.Response && json.Response.View && json.Response.View.length) {
-      results = this._formatResponse(json);
-    }
-
-    callback(results, response.status);
   }
-
   autocompleteAdapter(params, callback) {
     const returnSuggestions = (predictions, status) => {
       predictions = predictions || [];
@@ -335,7 +337,7 @@ class HereGeocoder extends ProviderGeocoder {
     };
 
     if (params.term && params.term !== '') {
-      this.suggest(params.term, returnSuggestions);
+        this.suggest(params, returnSuggestions);
     } else {
       const data = { results: [] };
       callback(data);
