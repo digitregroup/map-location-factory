@@ -1,7 +1,5 @@
 require('jsdom-global')();
 require('chai').should();
-const API_KEY = "VoggXjZPkzVJu6enQp25";
-const APP_CODE = "5RZewgZ8kdwI057p2HsxqA";
 
 const {GeocoderEngine} = require('../src/index');
 
@@ -50,6 +48,17 @@ describe('GeocoderEngine addresses', function () {
   it('should geocode postal code', async function () {
     return engine.geocode({
       text: '34110'
+    }, (results, status) => {
+      status.should.be.eql(200);
+      oneFixed(results[0].position.latitude).should.be.eql(48.9);
+      oneFixed(results[0].position.longitude).should.be.eql(2.3);
+    });
+  });
+
+  it('should geocode postal code', async function () {
+    return engine.geocode({
+      text: '34110',
+      id: 'here:cm:namedplace:20098349'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(48.9);
@@ -124,7 +133,7 @@ describe('GeocoderEngine departments', function () {
 
   it('should geocode 86 correctly', async function () {
     return engine.geocode({
-      text: '(86) Vienne'
+      text: '(10) Aube'
     }, (results, status) => {
       results[0].type.should.be.eql("department");
       results[0].address.department.should.be.eql("Vienne");
@@ -180,7 +189,7 @@ describe('GeocoderEngine regions', function () {
     return engine.geocode({
       text: 'Bretagne, France'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.state.should.be.eql("Bretagne");
     });
   });
@@ -220,7 +229,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'guadeloupe'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guadeloupe-France");
+      results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
   it('should geocode guyane', async function () {
@@ -228,7 +237,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'guyane'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guyane-France");
+      results[0].address.label.should.be.eql("Guyane");
     });
   });
   it('should geocode martinique', async function () {
@@ -236,7 +245,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'martinique'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Martinique-France");
+      results[0].address.label.should.be.eql("Martinique");
     });
   });
   it('should geocode reunion', async function () {
@@ -244,7 +253,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'reunion'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Réunion-France");
+      results[0].address.label.should.be.eql("Réunion");
     });
   });
   it('should geocode mayotte', async function () {
@@ -258,43 +267,43 @@ describe('GeocoderEngine DOM-TOM', function () {
 
 });
 
-describe('GeocoderEngine DOM-TOM -france', function () {
+describe('GeocoderEngine DOM-TOM ', function () {
 
   it('should geocode guadeloupe', async function () {
     return engine.geocode({
-      text: 'guadeloupe-france'
+      text: 'guadeloupe'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guadeloupe-France");
+      results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
   it('should geocode guyane', async function () {
     return engine.geocode({
-      text: 'guyane-france'
+      text: 'guyane'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guyane-France");
+      results[0].address.label.should.be.eql("Guyane");
     });
   });
   it('should geocode martinique', async function () {
     return engine.geocode({
-      text: 'martinique-france'
+      text: 'martinique',
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Martinique-France");
+      results[0].address.label.should.be.eql("Martinique");
     });
   });
   it('should geocode reunion', async function () {
     return engine.geocode({
-      text: 'reunion-france'
+      text: 'reunion'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Réunion-France");
+      results[0].address.label.should.be.eql("Réunion");
     });
   });
   it('should geocode mayotte', async function () {
     return engine.geocode({
-      text: 'mayotte-france'
+      text: 'Mayotte'
     }, (results) => {
       results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Mayotte");

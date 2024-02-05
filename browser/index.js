@@ -18399,36 +18399,37 @@ var geocoderClasses = (_geocoderClasses = {}, (0, _defineProperty2.default)(_geo
 var defaultCountries = 'FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
 var defaultLanguage = 'FR';
 var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_HERE, {
-  suggest: {
-    baseUrl: 'https://autocomplete.geocoder.api.here.com',
-    path: '/6.2/',
-    resource: 'suggest',
-    options: {
-      country: defaultCountries,
-      language: defaultLanguage,
-      maxresults: 50,
-      resultType: 'areas'
+    suggest: {
+      baseUrl:  'https://autocomplete.search.hereapi.com/v1/',
+          path:     '',
+          resource: 'autocomplete',
+          options:  {
+        limit: 5,
+            lang: defaultLanguage,
+      }
+    },
+    lookup: {
+      baseUrl: 'https://lookup.search.hereapi.com/v1/',
+          path: '',
+          resource: 'lookup',
+    },
+    geocode: {
+      baseUrl:  'https://geocode.search.hereapi.com/v1/',
+          path:     '',
+          resource: 'geocode',
+          options:  {
+        limit:5,
+            lang: defaultLanguage,
+      }
+    },
+    reverse: {
+      baseUrl:  'https://revgeocode.search.hereapi.com/v1/',
+          path:     '',
+          resource: 'revgeocode',
+          options:  {
+        type: 'houseNumber'
+      }
     }
-  },
-  geocode: {
-    baseUrl: 'https://geocoder.api.here.com',
-    path: '/6.2/',
-    resource: 'geocode',
-    options: {
-      country: defaultCountries,
-      language: defaultLanguage,
-      maxresults: 5
-    }
-  },
-  reverse: {
-    baseUrl: 'https://reverse.geocoder.api.here.com',
-    path: '/6.2/',
-    resource: 'reversegeocode',
-    options: {
-      language: defaultLanguage,
-      maxresults: 5
-    }
-  }
 }), (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_GOOGLE, {
   options: {
     types: ['(regions)'],

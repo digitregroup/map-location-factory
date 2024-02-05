@@ -27,7 +27,8 @@ class HereGeocoder extends ProviderGeocoder {
       district: 'district',
       street: 'route',
       houseNumber: 'street_number',
-      locality: 'city'
+      locality: 'city',
+      administrativeArea: 'country'
     };
 
     this.lookupUrl = 'https://lookup.search.hereapi.com/v1/lookup';
@@ -57,7 +58,7 @@ class HereGeocoder extends ProviderGeocoder {
           district: result.address.district,
           city: result.address.city,
           postal_code: result.address.postalCode,
-          department: this.departmentDatas[result.address.postalCode.substring(0,2)],
+          department: result.address.postalCode ? this.departmentDatas[result.address.postalCode.substring(0,2)] : null,
           state: result.address.state,
           country: result.address.countryCode,
           route: result.address.street,
@@ -90,14 +91,14 @@ class HereGeocoder extends ProviderGeocoder {
       '&apiKey=' + this.config.apiKey;
 
     if(query.at){
-      params += '&at=' + radius;
+      params += '&at=' + query.at;
     }
 
     if (this.config.suggest && this.config.suggest.options) {
       const buildParametersOptions = { ...this.config.suggest.options };
 
       // Check if the query is a number
-      if (query.trim().match(/^[0-9]*$/) !== null) {
+      if (query.term.trim().match(/^[0-9]*$/) !== null) {
 
         // Force result type to postal code if the query is a number
         buildParametersOptions.resultType = 'postalCode'
@@ -216,30 +217,39 @@ class HereGeocoder extends ProviderGeocoder {
         const dptCode = searchRequest.text.match(/^\(([\d]+)\)/);
         if (null !== dptCode) {
           // Match exact department (called "county" in Here)
-          params = 'county=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
+          params = 'q=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
+          params += '&types=area';
         } else {
           // Match text
           if (searchRequest.text.match(/^Bretagne(?:, France)?/i)) {
             // Specific case for Bretagne
-            params = 'state=' + encodeURIComponent('Bretagne');
+            params = 'q=' + encodeURIComponent('Bretagne');
+            params += '&qq=county';
           } else if (searchRequest.text.match(/^Lille(?:, France)?/i)) {
             // Specific case for "Lille, France", returns L'ille (district)
-            params = 'city=' + encodeURIComponent('Lille');
+            params = 'q=' + encodeURIComponent('Lille');
+            params += '&qq=city';
           } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
             // Specific case for "Nangis, France", returns Nangis (district)
-            params = 'city=' + encodeURIComponent('Nangis');
+            params = 'q=' + encodeURIComponent('Nangis');
+            params += '&qq=city';
           } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
             // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
             params = 'q=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
+            params += '&qq=country';
           } else {
             params = 'q=' + encodeURIComponent(searchRequest.text);
           }
         }
+      } else if(searchRequest.city) {
+        params = 'q=' + encodeURIComponent(searchRequest.text);
+        params += '&qq=city';
       } else {
         if (searchRequest.label) {
           if (searchRequest.label == "Vienne") {
             // Specific case for "Vienne" department name
             params = 'q=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+            params += 'qq=city';
           } else {
             params = 'q=' + encodeURIComponent(searchRequest.label);
           }
@@ -258,7 +268,7 @@ class HereGeocoder extends ProviderGeocoder {
       }
 
       // TODO : Make the country code dynamic
-      params += '&in=countryCode:FRA'
+      params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF'
       // params += '&qq=houseNumber';
       const url = this._getUrl(this.config.geocode.resource);
       const response = await this.getResponse(url, params);
