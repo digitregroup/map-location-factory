@@ -54,7 +54,7 @@ describe('GeocoderEngine', function () {
     });
   });
   it('should not output Mayotte, Mayotte, Mayotte', async function () {
-    return engine.suggest('Mayotte', (results, status) => {
+    return engine.suggest({term: 'Mayotte'}, (results, status) => {
 
       results.map(r => r.label)
         .indexOf('Mayotte, Mayotte, Mayotte')

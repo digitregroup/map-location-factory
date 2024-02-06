@@ -13,12 +13,12 @@ const engine = new GeocoderEngine(
 
 describe('GeocoderEngine.autocompleteAdapter', function () {
 
-  it('should interpret departments correctly', async function () {
+  it('should interpret address correctly', async function () {
     return engine.autocompleteAdapter({
       term: '12 rue de Montpellier',
       at: '43.610483778380875,3.8738222559274296',
     }, (results, status) => {
-      results.length.should.be.eql(3);
+      results.length.should.be.eql(5);
       status.should.be.eql(200);
     });
   });
@@ -28,9 +28,9 @@ describe('GeocoderEngine.DOM-TOM', function () {
 
   it('should interpret mayotte correctly', async function () {
     return engine.autocompleteAdapter({
-      term: '12 rue de Montpellier',
+      term: 'Mayotte',
     }, (results, status) => {
-      results.length.should.be.eql(3);
+      results.length.should.be.eql(5);
       status.should.be.eql(200);
     });
   });

@@ -28,7 +28,7 @@ class HereGeocoder extends ProviderGeocoder {
       street: 'route',
       houseNumber: 'street_number',
       locality: 'city',
-      administrativeArea: 'country'
+      administrativeArea: 'state'
     };
 
     this.lookupUrl = 'https://lookup.search.hereapi.com/v1/lookup';
@@ -37,7 +37,7 @@ class HereGeocoder extends ProviderGeocoder {
   _formatResponse(json) {
     return json.items.map(result => {
       return {
-        type: this.mappingAdmLevel[result.resultType],
+        type: this.mappingAdmLevel[result.resultType === 'locality' ? result.localityType : result.resultType],
         id: result.id,
         position: {
           latitude: result.position.lat,
@@ -221,36 +221,17 @@ class HereGeocoder extends ProviderGeocoder {
           params = 'q=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
           params += '&types=area';
         } else {
-          // Match text
-          if (searchRequest.text.match(/^Bretagne(?:, France)?/i)) {
-            // Specific case for Bretagne
-            params = 'q=' + encodeURIComponent('Bretagne');
-            params += '&qq=county';
-          } else if (searchRequest.text.match(/^Lille(?:, France)?/i)) {
-            // Specific case for "Lille, France", returns L'ille (district)
-            params = 'q=' + encodeURIComponent('Lille');
-            params += '&qq=city';
-          } else if (searchRequest.text.match(/^Nangis(?:, France)?/i)) {
-            // Specific case for "Nangis, France", returns Nangis (district)
-            params = 'q=' + encodeURIComponent('Nangis');
-            params += '&qq=city';
-          } else if (searchRequest.text.match(/-france$/i) && !searchRequest.text.match(/-de-france$/i)) {
-            // DOM-TOM countries appear as 'Guyanne-France', 'X-France', ... But not for "Ile-de-france"
-            params = 'q=' + encodeURIComponent(searchRequest.text.replace(/-france$/i, ''));
-            params += '&qq=country';
-          } else {
-            params = 'q=' + encodeURIComponent(searchRequest.text);
-          }
+          params = 'q=' + encodeURIComponent(searchRequest.text);
         }
       } else if(searchRequest.city) {
         params = 'q=' + encodeURIComponent(searchRequest.text);
-        params += '&qq=city';
+        params += '&types=city';
       } else {
         if (searchRequest.label) {
           if (searchRequest.label == "Vienne") {
             // Specific case for "Vienne" department name
             params = 'q=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
-            params += 'qq=city';
+            params += '&types=city';
           } else {
             params = 'q=' + encodeURIComponent(searchRequest.label);
           }
