@@ -87,7 +87,7 @@ class HereGeocoder extends ProviderGeocoder {
 
     const url = this._getUrl('suggest');
 
-    let params = 'q=' + encodeURIComponent(query) +
+    let params = 'q=' + encodeURIComponent(query.term) +
       '&apiKey=' + this.config.apiKey;
 
     if(query.at){
@@ -105,7 +105,8 @@ class HereGeocoder extends ProviderGeocoder {
       }
       params += this._buildParameters(buildParametersOptions);
     }
-
+    // TODO : Make the country code dynamic
+    params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF'
     const response = await fetch(url + params);
     const json = await response.json();
 
@@ -160,9 +161,9 @@ class HereGeocoder extends ProviderGeocoder {
 
       // Format response (inverse order label)
       .map(suggest => ({
-        label: suggest.address.label.split(', ').reverse().join(', '),
+        label: suggest.title,
         id: suggest.id,
-        type: this.mappingAdmLevel[suggest.resultType],
+        type: this.mappingAdmLevel[suggest.resultType === 'locality' ? suggest.localityType : suggest.resultType],
       }));
 
     callback(suggestions || null, response.status);
