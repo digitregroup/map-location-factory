@@ -12,10 +12,32 @@ const engine = new GeocoderEngine(
   });
 
 describe('GeocoderEngine', function () {
+  it('should not output French city with countryCode as array', async function () {
+    return engine.suggest({
+      term: 'Montpellier',
+      country: ['FRA', 'GLP', 'GUF', 'MTQ', 'REU', 'MYT', 'PYF', 'SPM', 'WLF', 'MAF', 'BLM']
+    }, (results, status) => {
+      results.map(r => r.label)
+          .indexOf('Montpellier')
+          .should.equal(-1);
 
+      status.should.be.eql(200);
+    });
+  });
+  it('should not output French city with countryCode as string', async function () {
+    return engine.suggest({
+      term: 'Montpellier',
+      country: 'FRA,GLP,GUF,MTQ,REU,MYT,PYF,SPM,WLF,MAF,BLM'
+    }, (results, status) => {
+      results.map(r => r.label)
+          .indexOf('Montpellier')
+          .should.equal(-1);
+
+      status.should.be.eql(200);
+    });
+  });
   it('should not output Guadeloupe, Guadeloupe, Guadeloupe', async function () {
     return engine.suggest({term: 'Guadeloupe'}, (results, status) => {
-
       results.map(r => r.label)
         .indexOf('Guadeloupe, Guadeloupe, Guadeloupe')
         .should.equal(-1);

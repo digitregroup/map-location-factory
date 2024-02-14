@@ -43,8 +43,9 @@ var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geoco
     path: '',
     resource: 'autocomplete',
     options: {
-      limit: 5,
-      lang: defaultLanguage
+      limit: 10,
+      lang: defaultLanguage,
+      country: defaultCountries
     }
   },
   lookup: {
@@ -58,15 +59,15 @@ var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geoco
     resource: 'geocode',
     options: {
       limit: 5,
-      lang: defaultLanguage
+      lang: defaultLanguage,
+      country: defaultCountries
     }
   },
   reverse: {
     baseUrl: 'https://revgeocode.search.hereapi.com/v1/',
     path: '',
     resource: 'revgeocode',
-    options: {
-      type: 'houseNumber'
+    options: {//type: 'houseNumber'
     }
   }
 }), (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_GOOGLE, {

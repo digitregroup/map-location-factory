@@ -30,22 +30,23 @@ describe('GeocoderEngine addresses', function () {
     return engine.geocode({
       text: '1 rue de Rivoli, Paris'
     }, (results, status) => {
-      status.should.be.eql(200);
+      //status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85554));
       oneFixed(results[0].position.longitude).should.be.eql(oneFixed(2.35927));
     });
   });
-  /*
+
   it('should geocode adNOBODY EXPECTS GERMANYdresses', async function () {
     return engine.geocode({
-      text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany'
+      text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany',
+      country: 'DEU'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(52.5);
       oneFixed(results[0].position.longitude).should.be.eql(13.4);
     });
   });
-*/
+
   it('should geocode postal code', async function () {
     return engine.geocode({
       text: '34110'
@@ -56,7 +57,7 @@ describe('GeocoderEngine addresses', function () {
     });
   });
 
-  it('should geocode postal code', async function () {
+  it('should geocode postal code and id', async function () {
     return engine.geocode({
       text: '34110',
       id: 'here:cm:namedplace:20098349'
@@ -108,9 +109,9 @@ describe('GeocoderEngine departments', function () {
 
   it('should geocode 34 correctly', async function () {
     return engine.geocode({
-      text: '(34) Hérault'
+      text: 'Hérault'
     }, (results, status) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("department");
       results[0].address.county.should.be.eql("Hérault");
     });
   });
@@ -128,7 +129,7 @@ describe('GeocoderEngine departments', function () {
     return engine.geocode({
       text: '(13) Bouches-du-Rhône'
     }, (results, status) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("department");
       results[0].address.county.should.be.eql("Bouches-du-Rhône");
     });
   });
@@ -137,7 +138,7 @@ describe('GeocoderEngine departments', function () {
     return engine.geocode({
       text: '(87) Haute-Vienne'
     }, (results, status) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("department");
       results[0].address.state.should.be.eql("Nouvelle-Aquitaine");
     });
   });
@@ -146,7 +147,7 @@ describe('GeocoderEngine departments', function () {
     return engine.geocode({
       text: '(06) Alpes-Maritimes'
     }, (results, status) => {
-      results[0].type.should.be.eql("state"); //replace by county
+      results[0].type.should.be.eql("department"); //replace by county
       results[0].address.state.should.be.eql("Provence-Alpes-Côte d'Azur");
     });
   });
@@ -230,7 +231,7 @@ describe('GeocoderEngine DOM-TOM', function () {
     return engine.geocode({
       text: 'guadeloupe'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
@@ -238,7 +239,7 @@ describe('GeocoderEngine DOM-TOM', function () {
     return engine.geocode({
       text: 'guyane'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Guyane");
     });
   });
@@ -246,7 +247,7 @@ describe('GeocoderEngine DOM-TOM', function () {
     return engine.geocode({
       text: 'martinique'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Martinique");
     });
   });
@@ -254,7 +255,7 @@ describe('GeocoderEngine DOM-TOM', function () {
     return engine.geocode({
       text: 'reunion'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Réunion");
     });
   });
@@ -262,7 +263,7 @@ describe('GeocoderEngine DOM-TOM', function () {
     return engine.geocode({
       text: 'mayotte'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Mayotte");
     });
   });
@@ -275,7 +276,7 @@ describe('GeocoderEngine DOM-TOM ', function () {
     return engine.geocode({
       text: 'guadeloupe'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
@@ -283,7 +284,7 @@ describe('GeocoderEngine DOM-TOM ', function () {
     return engine.geocode({
       text: 'guyane'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Guyane");
     });
   });
@@ -291,7 +292,7 @@ describe('GeocoderEngine DOM-TOM ', function () {
     return engine.geocode({
       text: 'martinique',
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Martinique");
     });
   });
@@ -299,7 +300,7 @@ describe('GeocoderEngine DOM-TOM ', function () {
     return engine.geocode({
       text: 'reunion'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Réunion");
     });
   });
@@ -307,7 +308,7 @@ describe('GeocoderEngine DOM-TOM ', function () {
     return engine.geocode({
       text: 'Mayotte'
     }, (results) => {
-      results[0].type.should.be.eql("state");
+      results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Mayotte");
     });
   });

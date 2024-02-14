@@ -18271,8 +18271,9 @@ var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geoco
     path: '',
     resource: 'autocomplete',
     options: {
-      limit: 5,
-      lang: defaultLanguage
+      limit: 10,
+      lang: defaultLanguage,
+      country: defaultCountries
     }
   },
   lookup: {
@@ -18286,16 +18287,15 @@ var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geoco
     resource: 'geocode',
     options: {
       limit: 5,
-      lang: defaultLanguage
+      lang: defaultLanguage,
+      country: defaultCountries
     }
   },
   reverse: {
     baseUrl: 'https://revgeocode.search.hereapi.com/v1/',
     path: '',
     resource: 'revgeocode',
-    options: {
-      type: 'houseNumber'
-    }
+    options: {}
   }
 }), (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_GOOGLE, {
   options: {
@@ -18629,6 +18629,8 @@ var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/sli
 
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
+var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
+
 var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
@@ -18681,6 +18683,8 @@ function _objectSpread(target) {
   return target;
 }
 
+var domTomCountryCodes = ['GLP', 'GUF', 'MTQ', 'REU', 'MYT', 'BLM', 'MAF', 'NCL', 'PYF', 'SPM', 'ATF', 'WLF'];
+
 var urlJoin = function urlJoin() {
   for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
     args[_key] = arguments[_key];
@@ -18706,10 +18710,10 @@ var HereGeocoder = function (_ProviderGeocoder) {
       postalCode: 'postal_code',
       city: 'city',
       district: 'district',
+      subdistrict: 'district',
       street: 'route',
       houseNumber: 'street_number',
-      locality: 'city',
-      administrativeArea: 'state'
+      locality: 'city'
     };
     _this.lookupUrl = 'https://lookup.search.hereapi.com/v1/lookup';
     return _this;
@@ -18722,7 +18726,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
 
       return json.items.map(function (result) {
         return {
-          type: _this2.mappingAdmLevel[result.resultType === 'locality' ? result.localityType : result.resultType],
+          type: _this2._getType(result),
           id: result.id,
           position: {
             latitude: result.position.lat,
@@ -18750,6 +18754,35 @@ var HereGeocoder = function (_ProviderGeocoder) {
       return this.config[type].baseUrl + this.config[type].resource + '?';
     }
   }, {
+    key: "_getType",
+    value: function _getType(suggestion) {
+      var type;
+
+      switch (suggestion.resultType) {
+        case 'county':
+          type = suggestion.countyType;
+          break;
+
+        case 'locality':
+          type = suggestion.localityType;
+          break;
+
+        case 'administrativeArea':
+          type = suggestion.administrativeAreaType;
+          break;
+
+        case 'houseNumber':
+          type = 'houseNumber';
+          break;
+
+        default:
+          type = 'houseNumber';
+          break;
+      }
+
+      return this.mappingAdmLevel[type];
+    }
+  }, {
     key: "_buildParameters",
     value: function _buildParameters(options) {
       var params = '';
@@ -18766,7 +18799,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
       var _suggest = (0, _asyncToGenerator2.default)(_regenerator.default.mark(function _callee(query, callback) {
         var _this3 = this;
 
-        var url, params, buildParametersOptions, response, json, domTomCountryCodes, suggestions;
+        var url, params, buildParametersOptions, countryCodes, response, json, suggestions;
         return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -18788,26 +18821,21 @@ var HereGeocoder = function (_ProviderGeocoder) {
 
                 if (this.config.suggest && this.config.suggest.options) {
                   buildParametersOptions = _objectSpread({}, this.config.suggest.options);
-
-                  if (query.term.trim().match(/^[0-9]*$/) !== null) {
-                    buildParametersOptions.resultType = 'postalCode';
-                  }
-
                   params += this._buildParameters(buildParametersOptions);
                 }
 
-                params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
-                _context.next = 9;
+                countryCodes = query.country || this.config.suggest.options.country;
+                params += "&in=countryCode:".concat((0, _typeof2.default)(countryCodes) === 'object' ? countryCodes.toString() : countryCodes);
+                _context.next = 10;
                 return (0, _crossFetch.default)(url + params);
 
-              case 9:
+              case 10:
                 response = _context.sent;
-                _context.next = 12;
+                _context.next = 13;
                 return response.json();
 
-              case 12:
+              case 13:
                 json = _context.sent;
-                domTomCountryCodes = ['GLP', 'GUF', 'MTQ', 'REU', 'MYT', 'BLM', 'MAF', 'NCL', 'PYF', 'SPM', 'ATF', 'WLF'];
                 suggestions = json.items && json.items.filter(function (suggest) {
                   return domTomCountryCodes.includes(suggest.address.countryCode) ? !['county', 'state'].includes(suggest.address) : true;
                 }).reduce(function (res, next) {
@@ -18833,9 +18861,9 @@ var HereGeocoder = function (_ProviderGeocoder) {
                   })]);
                 }, []).map(function (suggest) {
                   return {
-                    label: suggest.title,
+                    label: suggest.address.label,
                     id: suggest.id,
-                    type: _this3.mappingAdmLevel[suggest.resultType === 'locality' ? suggest.localityType : suggest.resultType]
+                    type: _this3._getType(suggest)
                   };
                 });
                 callback(suggestions || null, response.status);
@@ -18925,7 +18953,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
     key: "geocode",
     value: function () {
       var _geocode = (0, _asyncToGenerator2.default)(_regenerator.default.mark(function _callee3(searchRequest, callback) {
-        var params, url, _params, response, json, dptCode, _url, _response, _json, results;
+        var params, url, _params, response, json, dptCode, countryCodes, _url, _response, _json, results;
 
         return _regenerator.default.wrap(function _callee3$(_context3) {
           while (1) {
@@ -18962,7 +18990,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
                   items: _context3.t1
                 };
                 callback(this._formatResponse(json), response.status);
-                _context3.next = 34;
+                _context3.next = 35;
                 break;
 
               case 17:
@@ -19004,17 +19032,18 @@ var HereGeocoder = function (_ProviderGeocoder) {
                   params += this._buildParameters(this.config.geocode.options);
                 }
 
-                params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
+                countryCodes = searchRequest.country || this.config.geocode.options.country;
+                params += "&in=countryCode:".concat((0, _typeof2.default)(countryCodes) === 'object' ? countryCodes.toString() : countryCodes);
                 _url = this._getUrl(this.config.geocode.resource);
-                _context3.next = 27;
+                _context3.next = 28;
                 return this.getResponse(_url, params);
 
-              case 27:
+              case 28:
                 _response = _context3.sent;
-                _context3.next = 30;
+                _context3.next = 31;
                 return _response.json();
 
-              case 30:
+              case 31:
                 _json = _context3.sent;
                 results = [];
 
@@ -19024,7 +19053,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
 
                 callback(results, _response.status);
 
-              case 34:
+              case 35:
               case "end":
                 return _context3.stop();
             }
@@ -19102,8 +19131,6 @@ var HereGeocoder = function (_ProviderGeocoder) {
   }, {
     key: "autocompleteAdapter",
     value: function autocompleteAdapter(params, callback) {
-      var _this4 = this;
-
       var returnSuggestions = function returnSuggestions(predictions, status) {
         predictions = predictions || [];
         var data = {
@@ -19112,17 +19139,6 @@ var HereGeocoder = function (_ProviderGeocoder) {
 
         if (status !== 200 || !predictions) {
           callback(data);
-        }
-
-        var deptCode = params.term.toUpperCase();
-        var departementName = _this4.departmentDatas[deptCode];
-
-        if (departementName) {
-          data.results.push({
-            id: params.term,
-            text: '(' + deptCode + ') ' + departementName,
-            type: _this4.mappingAdmLevel.county
-          });
         }
 
         for (var i = 0; i < predictions.length; i++) {
@@ -19152,7 +19168,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
 var _default = HereGeocoder;
 exports.default = _default;
 
-},{"../ProviderGeocoder":128,"@babel/runtime/helpers/asyncToGenerator":4,"@babel/runtime/helpers/classCallCheck":5,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":8,"@babel/runtime/helpers/inherits":9,"@babel/runtime/helpers/interopRequireDefault":10,"@babel/runtime/helpers/possibleConstructorReturn":15,"@babel/runtime/helpers/slicedToArray":17,"@babel/runtime/helpers/toConsumableArray":18,"@babel/runtime/regenerator":20,"cross-fetch":21}],127:[function(require,module,exports){
+},{"../ProviderGeocoder":128,"@babel/runtime/helpers/asyncToGenerator":4,"@babel/runtime/helpers/classCallCheck":5,"@babel/runtime/helpers/createClass":6,"@babel/runtime/helpers/defineProperty":7,"@babel/runtime/helpers/getPrototypeOf":8,"@babel/runtime/helpers/inherits":9,"@babel/runtime/helpers/interopRequireDefault":10,"@babel/runtime/helpers/possibleConstructorReturn":15,"@babel/runtime/helpers/slicedToArray":17,"@babel/runtime/helpers/toConsumableArray":18,"@babel/runtime/helpers/typeof":19,"@babel/runtime/regenerator":20,"cross-fetch":21}],127:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");

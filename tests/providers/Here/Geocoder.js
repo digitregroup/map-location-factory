@@ -13,30 +13,31 @@ const defaultLanguage  = 'fr';
 
 // Configs
 const geocoderConfig = {
-  // appId: '',
-  // appCode: '',
   suggest: {
     baseUrl:  'https://autosuggest.search.hereapi.com/v1/',
     path:     '',
     resource: 'autosuggest',
     options:  {
-      limit:5,
+      country: defaultCountries,
       lang: defaultLanguage,
+      limit: 5,
     }
   },
   geocode: {
-    baseUrl:  'https://autocomplete.search.hereapi.com/v1/',
+    baseUrl:  'https://geocode.search.hereapi.com/v1/',
     path:     '',
-    resource: 'autocomplete',
+    resource: 'geocode',
     options:  {
-      limit:5,
+      country: defaultCountries,
       lang: defaultLanguage,
+      limit: 5,
+
     }
   },
   reverse: {
-    baseUrl:  'https://reverse.geocoder.api.here.com',
-    path:     '/6.2/',
-    resource: 'reversegeocode',
+    baseUrl:  'https://revgeocode.search.hereapi.com/v1/',
+    path:     '',
+    resource: 'revgeocode',
     options:  {
       language:   defaultLanguage,
       maxresults: 5

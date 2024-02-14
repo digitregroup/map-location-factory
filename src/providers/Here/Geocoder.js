@@ -1,6 +1,22 @@
 
 import ProviderGeocoder from '../ProviderGeocoder';
-import fetch from 'cross-fetch'
+import fetch from 'cross-fetch';
+
+const domTomCountryCodes = [
+  'GLP',
+  'GUF',
+  'MTQ',
+  'REU',
+  'MYT',
+  'BLM',
+  'MAF',
+  'NCL',
+  'PYF',
+  'SPM',
+  'ATF',
+  'WLF'
+];
+
 const urlJoin = (...args) =>
   args
     .join('/')
@@ -25,10 +41,10 @@ class HereGeocoder extends ProviderGeocoder {
       postalCode: 'postal_code',
       city: 'city',
       district: 'district',
+      subdistrict: 'district',
       street: 'route',
       houseNumber: 'street_number',
       locality: 'city',
-      administrativeArea: 'state'
     };
 
     this.lookupUrl = 'https://lookup.search.hereapi.com/v1/lookup';
@@ -37,7 +53,7 @@ class HereGeocoder extends ProviderGeocoder {
   _formatResponse(json) {
     return json.items.map(result => {
       return {
-        type: this.mappingAdmLevel[result.resultType === 'locality' ? result.localityType : result.resultType],
+        type: this._getType(result),
         id: result.id,
         position: {
           latitude: result.position.lat,
@@ -74,6 +90,25 @@ class HereGeocoder extends ProviderGeocoder {
       this.config[type].resource + '?';
   }
 
+  /**
+   *
+   * @param suggestion
+   * @returns {*} type
+   */
+  _getType(suggestion) {
+    let type;
+    switch(suggestion.resultType) {
+      case 'county': type = suggestion.countyType; break;
+      case 'locality': type = suggestion.localityType; break;
+      case 'administrativeArea': type = suggestion.administrativeAreaType; break;
+      case 'houseNumber': type = 'houseNumber'; break;
+      default : type = 'houseNumber'; break;
+    }
+
+    return this.mappingAdmLevel[type];
+
+
+  }
   _buildParameters(options) {
     let params = '';
     for (const attribute in options) {
@@ -97,33 +132,15 @@ class HereGeocoder extends ProviderGeocoder {
     if (this.config.suggest && this.config.suggest.options) {
       const buildParametersOptions = { ...this.config.suggest.options };
 
-      // Check if the query is a number
-      if (query.term.trim().match(/^[0-9]*$/) !== null) {
-
-        // Force result type to postal code if the query is a number
-        buildParametersOptions.resultType = 'postalCode'
-      }
       params += this._buildParameters(buildParametersOptions);
     }
-    // TODO : Make the country code dynamic
-    params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF'
+
+    const countryCodes = query.country || this.config.suggest.options.country;
+    params += `&in=countryCode:${typeof countryCodes === 'object' ? countryCodes.toString() : countryCodes}`;
+
     const response = await fetch(url + params);
     const json = await response.json();
 
-    const domTomCountryCodes = [
-      'GLP',
-      'GUF',
-      'MTQ',
-      'REU',
-      'MYT',
-      'BLM',
-      'MAF',
-      'NCL',
-      'PYF',
-      'SPM',
-      'ATF',
-      'WLF'
-    ];
 
     const suggestions = json.items && json.items
 
@@ -161,9 +178,9 @@ class HereGeocoder extends ProviderGeocoder {
 
       // Format response (inverse order label)
       .map(suggest => ({
-        label: suggest.title,
+        label: suggest.address.label,
         id: suggest.id,
-        type: this.mappingAdmLevel[suggest.resultType === 'locality' ? suggest.localityType : suggest.resultType],
+        type: this._getType(suggest),
       }));
 
     callback(suggestions || null, response.status);
@@ -249,9 +266,9 @@ class HereGeocoder extends ProviderGeocoder {
         params += this._buildParameters(this.config.geocode.options);
       }
 
-      // TODO : Make the country code dynamic
-      params += '&in=countryCode:FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF'
-      // params += '&qq=houseNumber';
+      const countryCodes = searchRequest.country || this.config.geocode.options.country;
+      params += `&in=countryCode:${typeof countryCodes === 'object' ? countryCodes.toString() : countryCodes}`;
+
       const url = this._getUrl(this.config.geocode.resource);
       const response = await this.getResponse(url, params);
 
@@ -304,17 +321,6 @@ class HereGeocoder extends ProviderGeocoder {
       const data = { results: [] };
       if (status !== 200 || !predictions) {
         callback(data);
-      }
-
-      // Get department by code
-      const deptCode = params.term.toUpperCase();
-      const departementName = this.departmentDatas[deptCode];
-      if (departementName) {
-        data.results.push({
-          id: params.term,
-          text: '(' + deptCode + ') ' + departementName,
-          type: this.mappingAdmLevel.county
-        });
       }
 
       for (let i = 0; i < predictions.length; i++) {

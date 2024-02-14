@@ -34,8 +34,9 @@ const geocoderConfig = {
       path:     '',
       resource: 'autocomplete',
       options:  {
-        limit: 5,
+        limit: 10,
         lang: defaultLanguage,
+        country: defaultCountries,
       }
     },
     lookup: {
@@ -48,8 +49,9 @@ const geocoderConfig = {
       path:     '',
       resource: 'geocode',
       options:  {
-        limit:5,
+        limit: 5,
         lang: defaultLanguage,
+        country: defaultCountries,
       }
     },
     reverse: {
@@ -57,7 +59,7 @@ const geocoderConfig = {
       path:     '',
       resource: 'revgeocode',
       options:  {
-        type: 'houseNumber'
+        //type: 'houseNumber'
       }
     }
   },
