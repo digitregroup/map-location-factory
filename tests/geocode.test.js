@@ -28,7 +28,9 @@ describe('GeocoderEngine addresses', function () {
 
   it('should geocode addresses', async function () {
     return engine.geocode({
-      text: '1 rue de Rivoli, Paris'
+      text: '1 rue de Rivoli, Paris',
+      //country: 'FRA',
+      types: "houseNumber",
     }, (results, status) => {
       //status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85554));

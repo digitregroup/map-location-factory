@@ -112,7 +112,7 @@ class HereGeocoder extends ProviderGeocoder {
   _buildParameters(options) {
     let params = '';
     for (const attribute in options) {
-      if (options[attribute] !== null) params += '&' + attribute + '=' + encodeURIComponent(options[attribute]);
+      if (options[attribute] !== null && attribute !== 'country') params += '&' + attribute + '=' + encodeURIComponent(options[attribute]);
     }
     return params;
   }
