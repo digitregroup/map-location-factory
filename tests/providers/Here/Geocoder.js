@@ -31,7 +31,6 @@ const geocoderConfig = {
       country: defaultCountries,
       lang: defaultLanguage,
       limit: 5,
-
     }
   },
   reverse: {
@@ -40,7 +39,7 @@ const geocoderConfig = {
     resource: 'revgeocode',
     options:  {
       language:   defaultLanguage,
-      maxresults: 5
+      limit: 5
     }
   }
 };
