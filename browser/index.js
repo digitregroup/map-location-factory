@@ -18788,7 +18788,7 @@ var HereGeocoder = function (_ProviderGeocoder) {
       var params = '';
 
       for (var attribute in options) {
-        if (options[attribute] !== null) params += '&' + attribute + '=' + encodeURIComponent(options[attribute]);
+        if (options[attribute] !== null && attribute !== 'country') params += '&' + attribute + '=' + encodeURIComponent(options[attribute]);
       }
 
       return params;
