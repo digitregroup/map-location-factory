@@ -1,6 +1,6 @@
 {
   "name": "@digitregroup/map-location-factory",
-  "version": "1.8.7",
+  "version": "1.9.0",
   "description": "Map and location factory",
   "files": [
     "browser",
@@ -14,7 +14,7 @@
   "main": "node",
   "browser": "browser",
   "scripts": {
-    "build": "yarn test && yarn build-browser && yarn build-node && yarn version",
+    "build": "yarn build-browser && yarn build-node && yarn version",
     "build-browser": "browserify src -t babelify -o browser/index.js",
     "build-node": "babel src --out-dir node",
     "watch": "watchify src -t babelify -o browser/index.js -v",

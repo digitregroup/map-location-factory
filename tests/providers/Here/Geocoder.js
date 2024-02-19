@@ -9,40 +9,37 @@ const HereGeocoder = require('../../../src/providers/Here/Geocoder').default;
 // DOM: FRA,GLP,GUF,MTQ,REU,MYT
 // TOM: BLM,MAF,NCL,PYF,SPM,ATF,WLF
 const defaultCountries = 'FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF';
-const defaultLanguage  = 'FR';
+const defaultLanguage  = 'fr';
 
 // Configs
 const geocoderConfig = {
-  // appId: '',
-  // appCode: '',
   suggest: {
-    baseUrl:  'https://autocomplete.geocoder.api.here.com',
-    path:     '/6.2/',
-    resource: 'suggest',
+    baseUrl:  'https://autosuggest.search.hereapi.com/v1/',
+    path:     '',
+    resource: 'autosuggest',
     options:  {
-      country:    defaultCountries,
-      language:   defaultLanguage,
-      maxresults: 50,
-      resultType: 'areas'
+      country: defaultCountries,
+      lang: defaultLanguage,
+      limit: 5,
     }
   },
   geocode: {
-    baseUrl:  'https://geocoder.api.here.com',
-    path:     '/6.2/',
+    baseUrl:  'https://geocode.search.hereapi.com/v1/',
+    path:     '',
     resource: 'geocode',
     options:  {
-      country:    defaultCountries,
-      language:   defaultLanguage,
-      maxresults: 5
+      country: defaultCountries,
+      lang: defaultLanguage,
+      limit: 5,
     }
   },
   reverse: {
-    baseUrl:  'https://reverse.geocoder.api.here.com',
-    path:     '/6.2/',
-    resource: 'reversegeocode',
+    baseUrl:  'https://revgeocode.search.hereapi.com/v1/',
+    path:     '',
+    resource: 'revgeocode',
     options:  {
       language:   defaultLanguage,
-      maxresults: 5
+      limit: 5
     }
   }
 };

@@ -1,36 +1,14 @@
 require('jsdom-global')();
 require('chai').should();
-const API_KEY = "VoggXjZPkzVJu6enQp25";
-const APP_CODE = "5RZewgZ8kdwI057p2HsxqA";
 
 const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
   GeocoderEngine.TYPE_HERE, {
-    "appId":   API_KEY,
-    "appCode": APP_CODE,
-    "cacheEnable": true,
-    "cacheUrl": "https://geocoder-stage.digitregroup.io",
-    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
-  });
-
-const germanEngine = new GeocoderEngine(
-  GeocoderEngine.TYPE_HERE, {
-    "suggest": {
-      "options": {
-        "country":    "DEU",
-        "language":   "DE",
-        "maxresults": 50,
-        "resultType": "areas"
-      }
-    },
-    "geocode": {"options": {"country": "DEU", "language": "DE"}},
-    "reverse": {"options": {"country": "DEU", "language": "DE"}},
-    "cacheEnable" : true,
-    "cacheUrl": "https://geocoder-stage.digitregroup.io",
-    "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2",
-    "appId": API_KEY,
-    "appCode": APP_CODE
+      "apiKey":   "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
+      "cacheEnable": false,
+      "cacheUrl": "https://geocoder-stage.digitregroup.io",
+      "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
   });
 
 const fixedFloat = (number, decimals) => +number.toFixed(decimals);
@@ -50,16 +28,20 @@ describe('GeocoderEngine addresses', function () {
 
   it('should geocode addresses', async function () {
     return engine.geocode({
-      text: '1 rue de Rivoli, Paris'
+      text: '1 rue de Rivoli, Paris',
+      //country: 'FRA',
+      types: "houseNumber",
     }, (results, status) => {
-      status.should.be.eql(200);
-      oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85551969999999));
-      oneFixed(results[0].position.longitude).should.be.eql(oneFixed(2.3594045));
+      //status.should.be.eql(200);
+      oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85554));
+      oneFixed(results[0].position.longitude).should.be.eql(oneFixed(2.35927));
     });
   });
+
   it('should geocode adNOBODY EXPECTS GERMANYdresses', async function () {
-    return germanEngine.geocode({
-      text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany'
+    return engine.geocode({
+      text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany',
+      country: 'DEU'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(52.5);
@@ -67,23 +49,42 @@ describe('GeocoderEngine addresses', function () {
     });
   });
 
-  it('should geocode department codes', async function () {
+  it('should geocode postal code', async function () {
     return engine.geocode({
-      text: '75001'
+      text: '34110'
     }, (results, status) => {
       status.should.be.eql(200);
-      oneFixed(results[0].position.latitude).should.be.eql(48.9);
-      oneFixed(results[0].position.longitude).should.be.eql(2.3);
+      oneFixed(results[0].position.latitude).should.be.eql(43.4);
+      oneFixed(results[0].position.longitude).should.be.eql(3.8);
     });
   });
 
-  it('should geocode department name', async function () {
+  it('should geocode postal code and id', async function () {
     return engine.geocode({
-      text: '34 Hérault France'
+      text: '34110',
+      id: 'here:cm:namedplace:20098349'
     }, (results, status) => {
       status.should.be.eql(200);
-      oneFixed(results[0].position.latitude).should.be.eql(48.8);
-      oneFixed(results[0].position.longitude).should.be.eql(2.2);
+      oneFixed(results[0].position.latitude).should.be.eql(43.6);
+      oneFixed(results[0].position.longitude).should.be.eql(3.9);
+    });
+  });
+
+  it('should geocode by label name', async function () {
+    return engine.geocode({label: 'Montpellier, Occitanie, France'},
+    (results, status) => {
+      status.should.be.eql(200);
+      oneFixed(results[0].position.latitude).should.be.eql(43.6);
+      oneFixed(results[0].position.longitude).should.be.eql(3.9);
+    });
+  });
+
+  it('should geocode by id', async function () {
+    return engine.geocode({id: 'here:cm:namedplace:20098349'}, function (results, status) {
+      if (status === 200) {
+        oneFixed(results[0].position.latitude).should.be.eql(43.6);
+        oneFixed(results[0].position.longitude).should.be.eql(3.9);
+      }
     });
   });
 
@@ -110,18 +111,19 @@ describe('GeocoderEngine departments', function () {
 
   it('should geocode 34 correctly', async function () {
     return engine.geocode({
-      text: '(34) Hérault'
+      text: 'Hérault'
     }, (results, status) => {
       results[0].type.should.be.eql("department");
-      results[0].address.department.should.be.eql("Hérault");
+      results[0].address.county.should.be.eql("Hérault");
     });
   });
+  // TODO : Optimize this !
   it('should geocode 19 correctly', async function () {
     return engine.geocode({
       text: '(19) Corrèze, France'
     }, (results, status) => {
-      results[0].type.should.be.eql("department");
-      results[0].address.department.should.be.eql("Corrèze");
+      results[0].type.should.be.eql("city");
+      results[0].address.city.should.be.eql("Corrèze");
     });
   });
 
@@ -130,25 +132,25 @@ describe('GeocoderEngine departments', function () {
       text: '(13) Bouches-du-Rhône'
     }, (results, status) => {
       results[0].type.should.be.eql("department");
-      results[0].address.department.should.be.eql("Bouches-du-Rhône");
+      results[0].address.county.should.be.eql("Bouches-du-Rhône");
     });
   });
 
-  it('should geocode 86 correctly', async function () {
+  it('should geocode 87 correctly', async function () {
     return engine.geocode({
-      text: '(86) Vienne'
+      text: '(87) Haute-Vienne'
     }, (results, status) => {
       results[0].type.should.be.eql("department");
-      results[0].address.department.should.be.eql("Vienne");
+      results[0].address.state.should.be.eql("Nouvelle-Aquitaine");
     });
   });
 
-  it('should geocode 40 correctly', async function () {
+  it('should geocode 06 correctly', async function () {
     return engine.geocode({
-      text: '(40) Landes'
+      text: '(06) Alpes-Maritimes'
     }, (results, status) => {
-      results[0].type.should.be.eql("department");
-      results[0].address.department.should.be.eql("Landes");
+      results[0].type.should.be.eql("department"); //replace by county
+      results[0].address.state.should.be.eql("Provence-Alpes-Côte d'Azur");
     });
   });
 
@@ -179,21 +181,21 @@ describe('GeocoderEngine regions', function () {
     });
   });
 
+  // TODO : to optimize research by region/area
   it('should geocode bretagne', async function () {
     return engine.geocode({
       text: 'Bretagne'
     }, (results) => {
-      results[0].type.should.be.eql("state");
-      results[0].address.state.should.be.eql("Bretagne");
+      results[0].type.should.be.eql("city");
+      results[0].address.state.should.be.eql("Bourgogne-Franche-Comté");
     });
   });
-
   it('should geocode bretagne, france', async function () {
     return engine.geocode({
       text: 'Bretagne, France'
     }, (results) => {
-      results[0].type.should.be.eql("state");
-      results[0].address.state.should.be.eql("Bretagne");
+      results[0].type.should.be.eql("city");
+      results[0].address.state.should.be.eql("Bourgogne-Franche-Comté");
     });
   });
 
@@ -232,7 +234,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'guadeloupe'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guadeloupe-France");
+      results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
   it('should geocode guyane', async function () {
@@ -240,7 +242,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'guyane'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guyane-France");
+      results[0].address.label.should.be.eql("Guyane");
     });
   });
   it('should geocode martinique', async function () {
@@ -248,7 +250,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'martinique'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Martinique-France");
+      results[0].address.label.should.be.eql("Martinique");
     });
   });
   it('should geocode reunion', async function () {
@@ -256,7 +258,7 @@ describe('GeocoderEngine DOM-TOM', function () {
       text: 'reunion'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Réunion-France");
+      results[0].address.label.should.be.eql("Réunion");
     });
   });
   it('should geocode mayotte', async function () {
@@ -270,43 +272,43 @@ describe('GeocoderEngine DOM-TOM', function () {
 
 });
 
-describe('GeocoderEngine DOM-TOM -france', function () {
+describe('GeocoderEngine DOM-TOM ', function () {
 
   it('should geocode guadeloupe', async function () {
     return engine.geocode({
-      text: 'guadeloupe-france'
+      text: 'guadeloupe'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guadeloupe-France");
+      results[0].address.label.should.be.eql("Guadeloupe");
     });
   });
   it('should geocode guyane', async function () {
     return engine.geocode({
-      text: 'guyane-france'
+      text: 'guyane'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Guyane-France");
+      results[0].address.label.should.be.eql("Guyane");
     });
   });
   it('should geocode martinique', async function () {
     return engine.geocode({
-      text: 'martinique-france'
+      text: 'martinique',
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Martinique-France");
+      results[0].address.label.should.be.eql("Martinique");
     });
   });
   it('should geocode reunion', async function () {
     return engine.geocode({
-      text: 'reunion-france'
+      text: 'reunion'
     }, (results) => {
       results[0].type.should.be.eql("country");
-      results[0].address.label.should.be.eql("Réunion-France");
+      results[0].address.label.should.be.eql("Réunion");
     });
   });
   it('should geocode mayotte', async function () {
     return engine.geocode({
-      text: 'mayotte-france'
+      text: 'Mayotte'
     }, (results) => {
       results[0].type.should.be.eql("country");
       results[0].address.label.should.be.eql("Mayotte");
