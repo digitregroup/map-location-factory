@@ -207,7 +207,7 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.reverse.options);
     }
     let results;
-    const response = await this.getResponse(url, params);
+    const response = await this.getResponse('reverse-geocoder', url, params);
     const json = await response.json();
     results = json.items && json.items.length && this._formatResponse(json);
 
@@ -282,7 +282,7 @@ class HereGeocoder extends ProviderGeocoder {
       params += `&in=countryCode:${typeof countryCodes === 'object' ? countryCodes.toString() : countryCodes}`;
 
       const url = this._getUrl(this.config.geocode.resource);
-      const response = await this.getResponse(url, params);
+      const response = await this.getResponse('geocoder', url, params);
 
       const json = await response.json();
 
@@ -304,7 +304,7 @@ class HereGeocoder extends ProviderGeocoder {
    * @param {obj} params
    * @returns {Promise<Response>}
    */
-  async getResponse(hereUrl, params) {
+  async getResponse(type, hereUrl, params) {
     if (this.config.cacheEnable) {
       if(!this.config.cacheUrl || !this.config.cacheKey) {
         throw new Error("Missing parameter cacheUrl || cacheKey");
@@ -312,7 +312,8 @@ class HereGeocoder extends ProviderGeocoder {
       const paramsURLSearchParams = new URLSearchParams(params);
       params = Object.fromEntries(paramsURLSearchParams.entries());
 
-      const cacheUrl = urlJoin(this.config.cacheUrl,"geocoder");
+      const cacheUrl = urlJoin(this.config.cacheUrl,type);
+  ;
       return await fetch(cacheUrl, {
         method: "post",
         headers: {
