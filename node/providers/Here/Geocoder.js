@@ -350,7 +350,7 @@ function (_ProviderGeocoder) {
                 url = this._getUrl('lookup');
                 _params = 'id=' + searchRequest.id + '&apiKey=' + this.config.apiKey;
                 _context3.next = 8;
-                return this.getResponse(url, _params);
+                return (0, _crossFetch.default)(url + _params);
 
               case 8:
                 response = _context3.sent;
@@ -364,7 +364,7 @@ function (_ProviderGeocoder) {
                   items: _context3.t1
                 };
                 callback(this._formatResponse(json), response.status);
-                _context3.next = 35;
+                _context3.next = 36;
                 break;
 
               case 17:
@@ -379,9 +379,23 @@ function (_ProviderGeocoder) {
                   } else {
                     params = 'q=' + encodeURIComponent(searchRequest.text);
                   }
-                } else if (searchRequest.city) {
-                  params = 'q=' + encodeURIComponent(searchRequest.text);
-                  params += '&types=city';
+                }
+
+                if (searchRequest.city) {
+                  //params = 'q=' + encodeURIComponent(searchRequest.text);
+                  params += '&qq=city=' + encodeURIComponent(searchRequest.city);
+
+                  if (searchRequest.county) {
+                    params += ';county=' + encodeURIComponent(searchRequest.county);
+                  }
+
+                  if (searchRequest.country) {
+                    params += ';country=' + encodeURIComponent(searchRequest.country);
+                  }
+
+                  if (searchRequest.state) {
+                    params += ';state=' + encodeURIComponent(searchRequest.state);
+                  }
                 } else {
                   if (searchRequest.label) {
                     if (searchRequest.label == "Vienne") {
@@ -395,14 +409,14 @@ function (_ProviderGeocoder) {
                 }
 
                 if (params) {
-                  _context3.next = 21;
+                  _context3.next = 22;
                   break;
                 }
 
                 callback(null, 400);
                 return _context3.abrupt("return");
 
-              case 21:
+              case 22:
                 params += '&apiKey=' + this.config.apiKey;
 
                 if (this.config.geocode && this.config.geocode.options) {
@@ -412,15 +426,15 @@ function (_ProviderGeocoder) {
                 countryCodes = searchRequest.country || this.config.geocode.options.country;
                 params += "&in=countryCode:".concat((0, _typeof2.default)(countryCodes) === 'object' ? countryCodes.toString() : countryCodes);
                 _url = this._getUrl(this.config.geocode.resource);
-                _context3.next = 28;
+                _context3.next = 29;
                 return this.getResponse(_url, params);
 
-              case 28:
+              case 29:
                 _response = _context3.sent;
-                _context3.next = 31;
+                _context3.next = 32;
                 return _response.json();
 
-              case 31:
+              case 32:
                 _json = _context3.sent;
                 results = [];
 
@@ -430,7 +444,7 @@ function (_ProviderGeocoder) {
 
                 callback(results, _response.status);
 
-              case 35:
+              case 36:
               case "end":
                 return _context3.stop();
             }
