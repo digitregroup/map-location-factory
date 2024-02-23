@@ -59,7 +59,8 @@ const geocoderConfig = {
       path:     '',
       resource: 'revgeocode',
       options:  {
-        //type: 'houseNumber'
+        limit: 5,
+        lang: defaultLanguage,
       }
     }
   },

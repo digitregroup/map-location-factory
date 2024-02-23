@@ -67,7 +67,9 @@ var geocoderConfig = (_geocoderConfig = {}, (0, _defineProperty2.default)(_geoco
     baseUrl: 'https://revgeocode.search.hereapi.com/v1/',
     path: '',
     resource: 'revgeocode',
-    options: {//type: 'houseNumber'
+    options: {
+      limit: 5,
+      lang: defaultLanguage
     }
   }
 }), (0, _defineProperty2.default)(_geocoderConfig, GeocoderEngine.TYPE_GOOGLE, {

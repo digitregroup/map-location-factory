@@ -207,7 +207,7 @@ class HereGeocoder extends ProviderGeocoder {
       params += this._buildParameters(this.config.reverse.options);
     }
     let results;
-    const response = await this.getResponse(url, params);
+    const response = await this.getResponse('reverse-geocoder', url, params);
     const json = await response.json();
     results = json.items && json.items.length && this._formatResponse(json);
 
@@ -225,7 +225,7 @@ class HereGeocoder extends ProviderGeocoder {
     if (searchRequest.id) {
       const url = this._getUrl('lookup');
       const params = 'id=' + searchRequest.id + '&apiKey=' + this.config.apiKey;
-      const response = await this.getResponse(url, params);
+      const response = await fetch(url + params);
       const json = { items :  [await response.json()] };
 
       callback(this._formatResponse(json), response.status);
@@ -240,9 +240,20 @@ class HereGeocoder extends ProviderGeocoder {
         } else {
           params = 'q=' + encodeURIComponent(searchRequest.text);
         }
-      } else if(searchRequest.city) {
-        params = 'q=' + encodeURIComponent(searchRequest.text);
-        params += '&types=city';
+      }
+      if(searchRequest.city) {
+        //params = 'q=' + encodeURIComponent(searchRequest.text);
+        params += '&qq=city=' + encodeURIComponent(searchRequest.city);
+        if(searchRequest.county) {
+          params += ';county=' + encodeURIComponent(searchRequest.county);
+        }
+        if(searchRequest.country) {
+          params += ';country=' + encodeURIComponent(searchRequest.country);
+        }
+        if(searchRequest.state) {
+          params += ';state=' + encodeURIComponent(searchRequest.state);
+        }
+
       } else {
         if (searchRequest.label) {
           if (searchRequest.label == "Vienne") {
@@ -254,6 +265,7 @@ class HereGeocoder extends ProviderGeocoder {
           }
         }
       }
+
 
       if (!params) {
         callback(null, 400);
@@ -270,7 +282,7 @@ class HereGeocoder extends ProviderGeocoder {
       params += `&in=countryCode:${typeof countryCodes === 'object' ? countryCodes.toString() : countryCodes}`;
 
       const url = this._getUrl(this.config.geocode.resource);
-      const response = await this.getResponse(url, params);
+      const response = await this.getResponse('geocoder', url, params);
 
       const json = await response.json();
 
@@ -292,7 +304,7 @@ class HereGeocoder extends ProviderGeocoder {
    * @param {obj} params
    * @returns {Promise<Response>}
    */
-  async getResponse(hereUrl, params) {
+  async getResponse(type, hereUrl, params) {
     if (this.config.cacheEnable) {
       if(!this.config.cacheUrl || !this.config.cacheKey) {
         throw new Error("Missing parameter cacheUrl || cacheKey");
@@ -300,7 +312,8 @@ class HereGeocoder extends ProviderGeocoder {
       const paramsURLSearchParams = new URLSearchParams(params);
       params = Object.fromEntries(paramsURLSearchParams.entries());
 
-      const cacheUrl = urlJoin(this.config.cacheUrl,"geocoder");
+      const cacheUrl = urlJoin(this.config.cacheUrl,type);
+  ;
       return await fetch(cacheUrl, {
         method: "post",
         headers: {
