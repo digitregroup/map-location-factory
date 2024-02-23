@@ -225,7 +225,7 @@ class HereGeocoder extends ProviderGeocoder {
     if (searchRequest.id) {
       const url = this._getUrl('lookup');
       const params = 'id=' + searchRequest.id + '&apiKey=' + this.config.apiKey;
-      const response = await this.getResponse(url, params);
+      const response = await fetch(url + params);
       const json = { items :  [await response.json()] };
 
       callback(this._formatResponse(json), response.status);
@@ -240,9 +240,20 @@ class HereGeocoder extends ProviderGeocoder {
         } else {
           params = 'q=' + encodeURIComponent(searchRequest.text);
         }
-      } else if(searchRequest.city) {
-        params = 'q=' + encodeURIComponent(searchRequest.text);
-        params += '&types=city';
+      }
+      if(searchRequest.city) {
+        //params = 'q=' + encodeURIComponent(searchRequest.text);
+        params += '&qq=city=' + encodeURIComponent(searchRequest.city);
+        if(searchRequest.county) {
+          params += ';county=' + encodeURIComponent(searchRequest.county);
+        }
+        if(searchRequest.country) {
+          params += ';country=' + encodeURIComponent(searchRequest.country);
+        }
+        if(searchRequest.state) {
+          params += ';state=' + encodeURIComponent(searchRequest.state);
+        }
+
       } else {
         if (searchRequest.label) {
           if (searchRequest.label == "Vienne") {
@@ -254,6 +265,7 @@ class HereGeocoder extends ProviderGeocoder {
           }
         }
       }
+
 
       if (!params) {
         callback(null, 400);

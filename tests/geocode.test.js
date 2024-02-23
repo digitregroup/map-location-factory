@@ -29,7 +29,7 @@ describe('GeocoderEngine addresses', function () {
   it('should geocode addresses', async function () {
     return engine.geocode({
       text: '1 rue de Rivoli, Paris',
-      //country: 'FRA',
+      qq:'city=Montpellier&state=Occitanie&country=FRA&county=Corrèze',
       types: "houseNumber",
     }, (results, status) => {
       //status.should.be.eql(200);
@@ -115,6 +115,17 @@ describe('GeocoderEngine departments', function () {
     }, (results, status) => {
       results[0].type.should.be.eql("department");
       results[0].address.county.should.be.eql("Hérault");
+    });
+  });
+  it('should geocode multiple infos', async function () {
+    return engine.geocode({
+      text: '889 Rue de la Vieille Poste, 34000 Montpellier',
+      city: 'Montpellier',
+      //county: 'Hérault',
+      state: 'Occitanie'
+    }, (results, status) => {
+      results[0].type.should.be.eql("street_number");
+      results[0].address.city.should.be.eql("Montpellier");
     });
   });
   // TODO : Optimize this !
