@@ -274,9 +274,13 @@ class HereGeocoder extends ProviderGeocoder {
 
       params += '&apiKey=' + this.config.apiKey;
 
-      if (this.config.geocode && this.config.geocode.options) {
-        params += this._buildParameters(this.config.geocode.options);
+
+      if(searchRequest.options) {
+         params += this._buildParameters(searchRequest.options);
+      } else if (this.config.geocode && this.config.geocode.options) {
+         params += this._buildParameters(this.config.geocode.options);
       }
+
 
       const countryCodes = searchRequest.country || this.config.geocode.options.country;
       params += `&in=countryCode:${typeof countryCodes === 'object' ? countryCodes.toString() : countryCodes}`;

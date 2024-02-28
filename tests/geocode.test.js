@@ -5,11 +5,43 @@ const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
   GeocoderEngine.TYPE_HERE, {
-      "apiKey":   "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
-      "cacheEnable": false,
-      "cacheUrl": "https://geocoder-stage.digitregroup.io",
-      "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
-  });
+      "apiKey": "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
+      "suggest": {
+        "baseUrl": "https://autocomplete.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "autocomplete",
+        "options": {
+          "limit": 2,
+          "lang": "fr",
+          "country": "FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF",
+          "types": "city"
+        }
+      },
+      "lookup": {
+        "baseUrl": "https://lookup.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "lookup"
+      },
+      "geocode": {
+        "baseUrl": "https://geocode.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "geocode",
+        "options": {
+          "limit": 2,
+          "lang": "fr",
+          "country": "FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF"
+        }
+      },
+      "reverse": {
+        "baseUrl": "https://revgeocode.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "revgeocode",
+        "options": {
+          "limit": 2,
+          "lang": "DEU"
+        }
+      }
+    });
 
 const fixedFloat = (number, decimals) => +number.toFixed(decimals);
 
@@ -41,7 +73,7 @@ describe('GeocoderEngine addresses', function () {
   it('should geocode adNOBODY EXPECTS GERMANYdresses', async function () {
     return engine.geocode({
       text: 'Am Wriezener Bahnhof, 10243 Berlin, Germany',
-      country: 'DEU'
+      country: 'DEU',
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(52.5);
@@ -51,7 +83,7 @@ describe('GeocoderEngine addresses', function () {
 
   it('should geocode postal code', async function () {
     return engine.geocode({
-      text: '34110'
+      text: 'montpellier'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(43.4);
@@ -89,7 +121,10 @@ describe('GeocoderEngine addresses', function () {
   });
 
   it('should reverse-geocode', async function () {
-    return engine.reverse({latitude: 48.8555, longitude: 2.36039}, (results, status) => {
+    return engine.reverse({
+      latitude: 48.8555,
+      longitude: 2.36039
+    }, (results, status) => {
       status.should.be.eql(200);
       results[0].address.label.should.be.eql('10 Rue de Rivoli, 75004 Paris, France');
     });
@@ -111,7 +146,7 @@ describe('GeocoderEngine departments', function () {
 
   it('should geocode 34 correctly', async function () {
     return engine.geocode({
-      text: 'Hérault'
+      text: 'Hérault',
     }, (results, status) => {
       results[0].type.should.be.eql("department");
       results[0].address.county.should.be.eql("Hérault");
@@ -185,7 +220,7 @@ describe('GeocoderEngine regions', function () {
 
   it('should geocode occitanie', async function () {
     return engine.geocode({
-      text: 'Occitanie'
+      text: 'Occitanie',
     }, (results) => {
       results[0].type.should.be.eql("state");
       results[0].address.state.should.be.eql("Occitanie");
