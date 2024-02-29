@@ -40,6 +40,11 @@ describe('GeocoderEngine.autocompleteAdapter', function () {
   it('should interpret dpt Hérault term', async function () {
     return engine.autocompleteAdapter({
       term: 'Hérault',
+      options: {
+        limit: 2,
+        lang: 'DEU',
+        country: ['FRA,GLP,GUF,MTQ,REU,MYT,PYF,SPM,WLF,MAF,BLM'],
+      }
     }, (results, status) => {
       results.length.should.be.eql(5);
       status.should.be.eql(200);

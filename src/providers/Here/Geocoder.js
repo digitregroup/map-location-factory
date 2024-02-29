@@ -221,7 +221,7 @@ class HereGeocoder extends ProviderGeocoder {
     }
 
     let params;
-
+    let baseTypes;
     if (searchRequest.id) {
       const url = this._getUrl('lookup');
       const params = 'id=' + searchRequest.id + '&apiKey=' + this.config.apiKey;
@@ -236,36 +236,43 @@ class HereGeocoder extends ProviderGeocoder {
         if (null !== dptCode) {
           // Match exact department (called "county" in Here)
           params = 'q=' + encodeURIComponent(this.departmentDatas[dptCode[1]]);
-          params += '&types=area';
+          baseTypes = 'area';
         } else {
           params = 'q=' + encodeURIComponent(searchRequest.text);
         }
       }
-      if(searchRequest.city) {
-        //params = 'q=' + encodeURIComponent(searchRequest.text);
-        params += '&qq=city=' + encodeURIComponent(searchRequest.city);
-        if(searchRequest.county) {
-          params += ';county=' + encodeURIComponent(searchRequest.county);
-        }
-        if(searchRequest.country) {
-          params += ';country=' + encodeURIComponent(searchRequest.country);
-        }
-        if(searchRequest.state) {
-          params += ';state=' + encodeURIComponent(searchRequest.state);
-        }
 
-      } else {
-        if (searchRequest.label) {
-          if (searchRequest.label == "Vienne") {
-            // Specific case for "Vienne" department name
-            params = 'q=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
-            params += '&types=city';
-          } else {
-            params = 'q=' + encodeURIComponent(searchRequest.label);
-          }
+      else if (searchRequest.label) {
+        if (searchRequest.label == "Vienne") {
+          // Specific case for "Vienne" department name
+          params = 'q=' + encodeURIComponent('Vienne, Nouvelle-Aquitaine');
+          baseTypes = 'city';
+        } else {
+          params = 'q=' + encodeURIComponent(searchRequest.label);
         }
       }
 
+      else if(searchRequest.address) {
+        params = 'q=' + encodeURIComponent(searchRequest.address);
+      }
+
+      if(searchRequest.city) {
+        params += '&qq=city=' + encodeURIComponent(searchRequest.city);
+        if (searchRequest.county) {
+          params += ';county=' + encodeURIComponent(searchRequest.county);
+        }
+        if (searchRequest.country) {
+          params += ';country=' + encodeURIComponent(searchRequest.country);
+        }
+        if (searchRequest.state) {
+          params += ';state=' + encodeURIComponent(searchRequest.state);
+        }
+        baseTypes = 'city';
+      }
+
+      if(searchRequest.state && !searchRequest.city) {
+        params += '&qq=state=' + encodeURIComponent(searchRequest.state);
+      }
 
       if (!params) {
         callback(null, 400);
@@ -274,8 +281,12 @@ class HereGeocoder extends ProviderGeocoder {
 
       params += '&apiKey=' + this.config.apiKey;
 
-      if (this.config.geocode && this.config.geocode.options) {
-        params += this._buildParameters(this.config.geocode.options);
+      const options = searchRequest.types || baseTypes
+          ? {...this.config.geocode.options, types: searchRequest.types || baseTypes}
+          : this.config.geocode.options;
+
+      if (options) {
+         params += this._buildParameters(options);
       }
 
       const countryCodes = searchRequest.country || this.config.geocode.options.country;
