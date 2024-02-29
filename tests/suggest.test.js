@@ -4,12 +4,45 @@ require('chai').should();
 const {GeocoderEngine} = require('../src/index');
 
 const engine = new GeocoderEngine(
-  GeocoderEngine.TYPE_HERE, {
-      "apiKey":   "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
-      "cacheEnable": false,
-      "cacheUrl": "https://geocoder-stage.digitregroup.io",
-      "cacheKey": "ytH3v7APgW2c0BQF9UJuf4T6zM01TRLBkY5CiCF2"
-  });
+    'Here', {
+      "apiKey": "LG9WyQQ3DRWuS7Vq5rbKsPNZhp1Ss2Lj9w-jaXKyQ4g",
+      "suggest": {
+        "baseUrl": "https://autocomplete.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "autocomplete",
+        "options": {
+          "limit": 2,
+          "lang": "fr",
+          "country": "FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF",
+          "types": "city"
+        }
+      },
+      "lookup": {
+        "baseUrl": "https://lookup.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "lookup"
+      },
+      "geocode": {
+        "baseUrl": "https://geocode.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "geocode",
+        "options": {
+          "limit": 2,
+          "lang": "fr",
+          "country": "FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF"
+        }
+      },
+      "reverse": {
+        "baseUrl": "https://revgeocode.search.hereapi.com/v1/",
+        "path": "",
+        "resource": "revgeocode",
+        "options": {
+          "limit": 2,
+          "lang": "DEU"
+        }
+      }
+    }
+  );
 
 describe('GeocoderEngine', function () {
   it('should not output French city with countryCode as array', async function () {
@@ -27,7 +60,6 @@ describe('GeocoderEngine', function () {
   it('should not output French city with countryCode as string', async function () {
     return engine.suggest({
       term: 'Montpellier',
-      country: 'FRA,GLP,GUF,MTQ,REU,MYT,PYF,SPM,WLF,MAF,BLM'
     }, (results, status) => {
       results.map(r => r.label)
           .indexOf('Montpellier')
