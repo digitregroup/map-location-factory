@@ -61,8 +61,6 @@ describe('GeocoderEngine addresses', function () {
   it('should geocode addresses', async function () {
     return engine.geocode({
       text: '1 rue de Rivoli, Paris',
-      qq:'city=Montpellier&state=Occitanie&country=FRA&county=Corrèze',
-      types: "houseNumber",
     }, (results, status) => {
       //status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(oneFixed(48.85554));
@@ -132,7 +130,10 @@ describe('GeocoderEngine addresses', function () {
 
   it('should geocode with DigitRE address', async function () {
     return engine.geocode({
-      text: '889 Rue de la Vieille Poste, 34000 Montpellier'
+      text: '(34)',
+      country: 'FRA,GLP,GUF,MTQ,REU,MYT,BLM,MAF,NCL,PYF,SPM,ATF,WLF',
+      types: 'address',
+      county: 'Hérault'
     }, (results, status) => {
       status.should.be.eql(200);
       oneFixed(results[0].position.latitude).should.be.eql(oneFixed(43.616889));
